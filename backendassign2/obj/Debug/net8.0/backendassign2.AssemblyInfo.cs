@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("backendassign2")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7830fc8c9303fd3d72961a84036bc8af2628bee1")]
 [assembly: System.Reflection.AssemblyProductAttribute("backendassign2")]
 [assembly: System.Reflection.AssemblyTitleAttribute("backendassign2")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

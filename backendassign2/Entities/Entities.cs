@@ -4,10 +4,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace backendassign2.Entities;
 
-    public class Cook
-    {
+    //public class Cook
+    //{
 
-    [Key] // Marks the cookCPR as the primary key
+    /*[Key] // Marks the cookCPR as the primary key
     [MaxLength(15)] // Equivalent to VARCHAR(15)
     public string CookCPR { get; set; }
 
@@ -29,9 +29,9 @@ namespace backendassign2.Entities;
 
     [MaxLength(15)] // Equivalent to VARCHAR(15)
     public string PhoneNo { get; set; }
-    }
+    }*/
 
-    public class DeliveryDriver
+    /*public class DeliveryDriver
     {
         [Key]
         public int CyclistID { get; set; }
@@ -44,9 +44,9 @@ namespace backendassign2.Entities;
 
         [MaxLength(50)]
         public string BikeType { get; set; }
-    }
+    }*/
     
-    public class Customer
+    /*public class Customer
     {
         [Key]
         public int CustomerID { get; set; }
@@ -69,9 +69,9 @@ namespace backendassign2.Entities;
 
         [MaxLength(50)]
         public string PaymentOption { get; set; }
-    }
+    }*/
 
-    public class CustomerOrder
+    /*public class CustomerOrder
     {
         [Key] 
         public int OrderID { get; set; }
@@ -88,9 +88,9 @@ namespace backendassign2.Entities;
         // Foreign key relationship
         [ForeignKey("CustomerID")] 
         public int CustomerForeignKey { get; set; }
-    }
+    }*/
     
-    public class TripAddresses
+    /*public class TripAddresses
     {
         [Key]
         public int AddressID { get; set; }
@@ -104,9 +104,9 @@ namespace backendassign2.Entities;
 
         [MaxLength(255)]
         public string City { get; set; }
-    }
+    }*/
     
-    public class TripDetails
+    /*public class TripDetails
     {
         [Key]
         public int TripID { get; set; }
@@ -123,7 +123,6 @@ namespace backendassign2.Entities;
     
     [NotMapped]
     public string Address { get; set; }
-    public int AddressID { get; set; }
 
     [MaxLength(50)]
     public string Type { get; set; }
@@ -132,8 +131,6 @@ namespace backendassign2.Entities;
     public DeliveryDriver DeliveryDriver { get; set; }
 
     public CustomerOrder CustomerOrder { get; set; }
-
-    public TripAddresses TripAddresses { get; set; }
 
     // Foreign keys
     [ForeignKey("CyclistID")]
@@ -144,9 +141,9 @@ namespace backendassign2.Entities;
 
     [ForeignKey("AddressID")]
     public int AddressForeignKey { get; set; }
-    }
+    }*/
     
-    public class Meal
+    /*public class Meal
     {
         [Key, Column(Order = 1)]
         [MaxLength(15)]
@@ -170,9 +167,9 @@ namespace backendassign2.Entities;
 
         [ForeignKey("CookCPR")]
         public string CookForeignKey { get; set; }
-    }
+    }*/
     
-    public class OrderMeal
+    /*public class OrderMeal
     {
         [Key, Column(Order = 1)]
         public int OrderID { get; set; }
@@ -197,5 +194,5 @@ namespace backendassign2.Entities;
 
         [ForeignKey("CookCPR, Dish")]
         public string MealForeignKey { get; set; }
-    }
+    }*/
 

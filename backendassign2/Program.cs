@@ -20,6 +20,14 @@ builder.Services.AddDbContext<dbcontext>(options =>
     options.UseSqlServer(conn));
 var app = builder.Build();
 //tes
+//Seed the database
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<dbcontext>();
+    context.Database.EnsureCreated();
+    context.Seed();
+}
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

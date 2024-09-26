@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace backendassign2.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public class MenuController : ControllerBase
 {
     private readonly dbcontext _context;
@@ -23,12 +23,12 @@ public class MenuController : ControllerBase
     {
         return await CookService.GetDishesByCookAsync(cookCPR, _context);
     }
-    [HttpGet("GetOrderDetails")]
-    public async Task<IEnumerable<OrderMeal>> GetOrderDetails(int orderId)
-    {
-        return await CookService.GetOrderDetailsAsync(orderId, _context);
-    }
-    [HttpGet("GetTripDetails")]
+    //[HttpGet("GetOrderDetails")]
+    // public async Task<IEnumerable<OrderMeal>> GetOrderDetails(int orderId)
+    // {
+    //     return await CookService.GetOrderDetailsAsync(orderId, _context);
+    // }
+    /*[HttpGet("GetTripDetails")]
     public async Task<IEnumerable<TripDetails>> GetTripDetails(int tripId)
     {
         return await CookService.GetTripDetailsAsync(tripId, _context);
@@ -42,7 +42,7 @@ public class MenuController : ControllerBase
     public async Task<dynamic> GetCyclistEarningsAsync(int cyclistID)
     {
         return await CookService.GetCyclistEarningsAsync(cyclistID, _context);
-    }
+    }*/
     
     
     

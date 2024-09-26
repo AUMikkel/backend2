@@ -24,7 +24,7 @@ public static class CookService
     public static async Task<List<Meal>> GetDishesByCookAsync(string cookCPR, dbcontext _context)
     {
         return await _context.Meals
-            .Where(meal => meal.CookCPR == cookCPR)
+            .Where(meal => meal.Cook.CookCPR == cookCPR)
             .Select(meal => new Meal
             {
                 Dish = meal.Dish,
@@ -35,7 +35,7 @@ public static class CookService
             })
             .ToListAsync();
     }
-    public static async Task<List<OrderMeal>> GetOrderDetailsAsync(int orderId, dbcontext _context)
+    /*public static async Task<List<OrderMeal>> GetOrderDetailsAsync(int orderId, dbcontext _context)
     {
         return await _context.OrderMeals
             .Where(orderMeal => orderMeal.OrderID == orderId)
@@ -50,21 +50,29 @@ public static class CookService
                     CookCPR = cook.CookCPR
                 })
             .ToListAsync();
-    }
-    public static async Task<List<TripDetails>> GetTripDetailsAsync(int tripId, dbcontext _context)
+    }*/
+    /*public static async Task<List<TripDetails>> GetTripDetailsAsync(int tripId, dbcontext _context)
     {
         return await _context.TripDetails
             .Where(tripDetail => tripDetail.TripID == tripId)
             .Join(
-                _context.TripAddresses,
-                tripDetail => tripDetail.AddressID,
-                address => address.AddressID,
+                _context.TripDetails,
+                tripDetail => tripDetail.Address,
+                address => address.Address,
                 (tripDetail, address) => new TripDetails
                 {
                     Address = address.StreetName + " " + address.HouseNumber + ", " + address.Zipcode,
                     Time = tripDetail.Time,
                     Type = tripDetail.Type
                 })
+            .OrderBy(tripDetail => tripDetail.Time)
+            .ToListAsync();
+    }*/
+
+    /*public static async Task<List<TripDetails>> GetTripDetailsAsync(int tripID, dbcontext _context)
+    {
+        return await _context.TripDetails
+            .Where(tripDetail => tripDetail.TripID == tripID)
             .OrderBy(tripDetail => tripDetail.Time)
             .ToListAsync();
     }
@@ -138,7 +146,7 @@ public static class CookService
             })
             .OrderByDescending(dto => dto.AverageRating)
             .ToListAsync<dynamic>();
-    }
+    }*/
     
     
 

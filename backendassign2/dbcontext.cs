@@ -16,7 +16,8 @@ public class dbcontext : DbContext
     public DbSet<Meal> Meals { get; set; }
     public DbSet<OrderMeal> OrderMeals { get; set; }
     public DbSet<PaymentOption> PaymentOptions { get; set; }
-    public DbSet<BikeType> BikeTypes { get; set; }
+    public DbSet<BikeType> BikeType { get; set; }
+    public DbSet<Trip> Trip { get; set; }
     
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -51,16 +52,16 @@ public class dbcontext : DbContext
     public void Seed()
     {
         
-        PaymentOption cash = new PaymentOption { Type = "Cash" };
-        PaymentOption creditCard = new PaymentOption { Type = "Credit Card" };
-        PaymentOption mobilePay = new PaymentOption { Type = "MobilePay" };
+        PaymentOption cash = new PaymentOption { Option ="Cash" };
+        PaymentOption creditCard = new PaymentOption { Option = "Credit Card" };
+        PaymentOption mobilePay = new PaymentOption { Option = "MobilePay" };
         
-        BikeType mountainBike = new BikeType { Type = "mountainBike" };
-        BikeType roadBike = new BikeType { Type = "roadBike" };
-        BikeType cityBike = new BikeType { Type = "cityBike" };
-        BikeType electricBike = new BikeType { Type = "electricBike" };
+        BikeType mountainBike = new BikeType { Bike = "mountainBike" };
+        BikeType roadBike = new BikeType { Bike = "roadBike" };
+        BikeType cityBike = new BikeType { Bike = "cityBike" };
+        BikeType electricBike = new BikeType { Bike = "electricBike" };
         
-        BikeTypes.AddRange(mountainBike, roadBike, cityBike, electricBike);
+        BikeType.AddRange(mountainBike, roadBike, cityBike, electricBike);
         PaymentOptions.AddRange(cash, creditCard, mobilePay);
         
         Customer customer1 = new Customer
@@ -73,6 +74,7 @@ public class dbcontext : DbContext
             City = "City",
             PaymentOption = cash
         };
+        //customer1.PaymentOption = cash;
         Customer customer2 = new Customer
         {
             FullName = "Jane Doe",
@@ -83,7 +85,7 @@ public class dbcontext : DbContext
             City = "City",
             PaymentOption = creditCard
         };
-        
+       //customer2.PaymentOption = creditCard;
         Customer customer3 = new Customer
         {
             FullName = "Alice Doe",
@@ -94,6 +96,7 @@ public class dbcontext : DbContext
             City = "City",
             PaymentOption = mobilePay
         };
+        //customer3.PaymentOption = mobilePay;
         Customers.AddRange(customer1, customer2, customer3);
         
         Cook cook1 = new Cook
@@ -137,7 +140,7 @@ public class dbcontext : DbContext
             StartTime = new TimeOnly(14, 0),
             EndTime = new TimeOnly(15,0)
         };
-        Meals.AddRange(meal1, meal2);
+        
         
         DeliveryDriver driver1 = new DeliveryDriver
         {
@@ -157,7 +160,7 @@ public class dbcontext : DbContext
         {
             Customer = customer1,
             Timestamp = new DateTime(2024,08,12, 12,0,0),
-            Price = 100
+            Price = 100,
         };
         CustomerOrder order2 = new CustomerOrder
         {
@@ -165,7 +168,7 @@ public class dbcontext : DbContext
             Timestamp = new DateTime(2024,08,12, 14,0,0),
             Price = 200
         };
-        CustomerOrders.AddRange(order1, order2);
+        
         
         OrderMeal orderMeal1 = new OrderMeal
         {
@@ -179,27 +182,36 @@ public class dbcontext : DbContext
             Meal = meal2,
             Quantity = 2
         };
-        OrderMeals.AddRange(orderMeal1, orderMeal2);
         
-        TripDetails trip1 = new TripDetails
+
+        Trip trip1 = new Trip
         {
             DeliveryDriver = driver1,
-            CustomerOrder = order1,
+            rating = 5
+        };
+        
+        TripDetails tripdetails1 = new TripDetails
+        {
             Address = "Main Street 1, 1234 City",
             TripDate = new DateTime(2024,08,12, 12,0,0),
             Type = "Pickup",
-            Rating = 5
+            Trip = trip1
         };
-        TripDetails trip2 = new TripDetails
+        TripDetails tripdetails2 = new TripDetails
         {
-            DeliveryDriver = driver1,
-            CustomerOrder = order1,
             Address = "Second Street 2, 4321 City",
             TripDate = new DateTime(2024,08,12, 13,0,0),
             Type = "Delivery",
-            Rating = 4
+            Trip = trip1
         };
-        TripDetails.AddRange(trip1, trip2);
+        
+        Meals.AddRange(meal1, meal2);
+        CustomerOrders.AddRange(order1, order2);
+        OrderMeals.AddRange(orderMeal1, orderMeal2);
+        Trip.Add(trip1);
+        order1.Trip = trip1;
+        order2.Trip = trip1;
+        TripDetails.AddRange(tripdetails1, tripdetails2);
         
         SaveChanges();
         

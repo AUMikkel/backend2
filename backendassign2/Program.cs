@@ -12,7 +12,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var conn = builder.Configuration.GetConnectionString("DefaultConnection");
-var databaseName = builder.Configuration["DatabaseSettings:DatabaseName"];
+//var databaseName = builder.Configuration["DatabaseSettings:DatabaseName"];
+var databaseName = "Assignment2";
 // Replace placeholder with actual database name
 conn = conn.Replace("{DatabaseName}", databaseName);
 // Register DbContext with the dependency injection container

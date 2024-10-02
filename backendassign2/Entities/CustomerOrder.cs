@@ -6,7 +6,7 @@ namespace backendassign2.Entities;
 public class CustomerOrder
 {
     [Key] 
-    public int OrderID { get; set; }
+    public int OrderId{ get; set; }
     
     public int Price { get; set; }
 
@@ -22,6 +22,8 @@ public class CustomerOrder
     public ICollection<Meal> Meal { get; set; }
     
     public ICollection<OrderMeal> OrderMeal { get; set; }
+    
+    public Trip Trip { get; set; }
 
     
 }

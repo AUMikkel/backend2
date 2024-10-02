@@ -6,7 +6,7 @@ namespace backendassign2.Entities;
 public class TripDetails
 {
     [Key]
-    public int TripID { get; set; }
+    public int DetailId { get; set; }
 
    // public int OrderID { get; set; }
 
@@ -25,8 +25,7 @@ public class TripDetails
     public string Type { get; set; }
 
     // Relationships
-    public DeliveryDriver DeliveryDriver { get; set; }
-
-    public CustomerOrder CustomerOrder { get; set; }
+    
+    public Trip Trip { get; set; }
 
 }

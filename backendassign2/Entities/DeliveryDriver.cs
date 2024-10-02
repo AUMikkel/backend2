@@ -15,4 +15,5 @@ public class DeliveryDriver
     public string PhoneNo { get; set; }
     
     public BikeType BikeType { get; set; }
+    public ICollection<Trip> Trip { get; set; }
 }

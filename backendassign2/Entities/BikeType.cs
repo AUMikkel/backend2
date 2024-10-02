@@ -5,7 +5,7 @@ namespace backendassign2.Entities;
 public class BikeType
 {
     [Key]
-    public string Type { get; set; }
+    public string Bike { get; set; }
     
     public ICollection<DeliveryDriver> DeliveryDriver { get; set; }
 }

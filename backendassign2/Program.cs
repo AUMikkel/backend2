@@ -1,6 +1,8 @@
 using backendassign2;
 using backendassign2.Services;
+using backendassign2.Swashbuckle;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,13 +11,20 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c=> {c.SchemaFilter<PriceValidationSchemaFilter>();}); // Register the schema filter
-
 var conn = builder.Configuration.GetConnectionString("DefaultConnection");
 //var databaseName = builder.Configuration["DatabaseSettings:DatabaseName"];
 var databaseName = "Assignment2";
 // Replace placeholder with actual database name
 conn = conn.Replace("{DatabaseName}", databaseName);
+builder.Services.AddMvc();
+
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Mys API", Version = "v1" });
+    c.SchemaFilter<PriceValidationSchemaFilter>();
+});
+
+
 // Register DbContext with the dependency injection container
 builder.Services.AddDbContext<dbcontext>(options =>
     options.UseSqlServer(conn));

@@ -1,24 +1,22 @@
+using backendassign2.Attributes;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using System.Linq;
+
+namespace backendassign2.Swashbuckle;
 
 public class PriceValidationSchemaFilter : ISchemaFilter
 {
     public void Apply(OpenApiSchema schema, SchemaFilterContext context)
     {
-        // Check if the model contains the PriceValidationAttribute
+        // Find the Price property that has PriceValidationAttribute
         var priceProperty = context.Type.GetProperties()
-            .FirstOrDefault(p => p.CustomAttributes
-                .Any(a => a.AttributeType == typeof(PriceValidationAttribute)));
-        
+            .FirstOrDefault(p => p.CustomAttributes.Any(a => a.AttributeType == typeof(PriceValidationAttribute)));
+
         if (priceProperty != null)
         {
-            // Add a description in Swagger for the price property
-            if (schema.Properties.ContainsKey(priceProperty.Name))
+            if (schema.Properties.ContainsKey("price"))
             {
-                var priceSchema = schema.Properties[priceProperty.Name];
-                
-                // Add custom validation message and constraints
+                var priceSchema = schema.Properties["price"];
                 priceSchema.Description += " (Custom Validation: Price cannot be negative)";
             }
         }

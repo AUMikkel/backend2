@@ -4543,19 +4543,19 @@
     ]
   },
   "packageFolders": {
-    "/home/mikk366b/.nuget/packages/": {}
+    "/Users/asgerleth/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/mikk366b/backend/assignments/backend2/backendassign2/backendassign2.csproj",
+      "projectUniqueName": "/Users/asgerleth/RiderProjects/backendassign2/backendassign2/backendassign2.csproj",
       "projectName": "backendassign2",
-      "projectPath": "/home/mikk366b/backend/assignments/backend2/backendassign2/backendassign2.csproj",
-      "packagesPath": "/home/mikk366b/.nuget/packages/",
-      "outputPath": "/home/mikk366b/backend/assignments/backend2/backendassign2/obj/",
+      "projectPath": "/Users/asgerleth/RiderProjects/backendassign2/backendassign2/backendassign2.csproj",
+      "packagesPath": "/Users/asgerleth/.nuget/packages/",
+      "outputPath": "/Users/asgerleth/RiderProjects/backendassign2/backendassign2/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/home/mikk366b/.nuget/NuGet/NuGet.Config"
+        "/Users/asgerleth/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
@@ -4573,11 +4573,6 @@
         "warnAsError": [
           "NU1605"
         ]
-      },
-      "restoreAuditProperties": {
-        "enableAudit": "true",
-        "auditLevel": "low",
-        "auditMode": "direct"
       }
     },
     "frameworks": {
@@ -4628,7 +4623,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/8.0.401/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.402/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

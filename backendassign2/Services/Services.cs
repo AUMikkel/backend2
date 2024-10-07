@@ -192,10 +192,10 @@ public static class CookService
          "cookCPR": "0987654321"
        }
      */
-    public static async Task AddMealAsync(ServiceDto.AddMealDto mealDto, dbcontext _context)
+    public static async Task AddMealAsync(ServiceDto.AddMealDto AddmealDto, dbcontext _context)
     {
         var cook = await _context.Cooks
-            .Where(cook => cook.CookCPR == mealDto.CookCPR)
+            .Where(cook => cook.CookCPR == AddmealDto.CookCPR)
             .FirstOrDefaultAsync();
         if (cook == null)
         {
@@ -203,11 +203,11 @@ public static class CookService
         }
         var meal = new Meal()
         {
-            Dish = mealDto.Dish,
-            Quantity = mealDto.Quantity,
-            Price = mealDto.Price,
-            StartTime = mealDto.StartTime,
-            EndTime = mealDto.EndTime,
+            Dish = AddmealDto.Dish,
+            Quantity = AddmealDto.Quantity,
+            Price = AddmealDto.Price,
+            StartTime = AddmealDto.StartTime,
+            EndTime = AddmealDto.EndTime,
             Cook = cook
         };
         _context.Meals.Add(meal);

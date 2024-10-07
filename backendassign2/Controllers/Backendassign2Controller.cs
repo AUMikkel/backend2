@@ -68,7 +68,7 @@ public class MenuController : ControllerBase
         return Ok();
     }
     
-    [HttpPut("DeleteMeal")]
+    [HttpDelete("DeleteMeal")]
     public async Task<ActionResult<ServiceDto.AddMealDto>> DeleteMeal(int mealId)
     {
         await CookService.DeleteMealAsync(mealId, _context);

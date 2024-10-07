@@ -18,7 +18,6 @@ public class TripDetails
 
     public int? Rating { get; set; }
     
-    [NotMapped]
     public string Address { get; set; }
 
     [MaxLength(50)]

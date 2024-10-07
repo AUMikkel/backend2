@@ -1,7 +1,11 @@
+using System.Globalization;
 using backendassign2.Entities;
 using System.Linq;
+using System.Runtime.Serialization;
 using backendassign2.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic;
 
 namespace backendassign2.Services;
 
@@ -10,23 +14,23 @@ public static class CookService
     static CookService()
     {
     }
-    public static async Task<List<Cook>> GetCooks(dbcontext _context)
+    public static async Task<List<ServiceDto.CookDto>> GetCooks(string name,dbcontext _context)
     {
         return await _context.Cooks
-            .Select(cook => new Cook
+            .Where(cook => cook.FullName.Equals(name))
+            .Select(cook => new ServiceDto.CookDto()
             {
-                FullName = cook.FullName,
                 Address = cook.StreetName + " " + cook.HouseNumber + ", " + cook.Zipcode + ", " + cook.City,
                 PhoneNo = cook.PhoneNo,
                 CookCPR = cook.CookCPR
             })
             .ToListAsync();
     }
-    public static async Task<List<Meal>> GetDishesByCookAsync(string cookCPR, dbcontext _context)
+    public static async Task<List<ServiceDto.MealDto>> GetDishesByCookAsync(string cookCPR, dbcontext _context)
     {
         return await _context.Meals
             .Where(meal => meal.Cook.CookCPR == cookCPR)
-            .Select(meal => new Meal
+            .Select(meal => new ServiceDto.MealDto()
             {
                 Dish = meal.Dish,
                 Quantity = meal.Quantity,
@@ -64,11 +68,9 @@ public static class CookService
                 meal => meal.mealId,
                 (orderMeal, meal) => new ServiceDto.OrderMealDto()
                 {
-                    MealId = meal.mealId,
-                    OrderId = orderMeal.OrderId,
+                    FullName = meal.Cook.FullName,
                     Dish = meal.Dish,
                     Quantity = orderMeal.Quantity,
-                    Rating = orderMeal.Rating
                 })
             .ToListAsync();
     }
@@ -88,10 +90,16 @@ public static class CookService
             .OrderBy(tripDetail => tripDetail.TripDate)
             .ToListAsync();
     }*/
-    public static async Task<List<Trip>> GetTripDetailsAsync(int tripId, dbcontext _context)
+    public static async Task<List<ServiceDto.TripDto>> GetTripDetailsAsync(int tripId, dbcontext _context)
     {
-        return await _context.Trip
-            .Where(trip => trip.TripId == tripId)
+        return await _context.TripDetails
+            .Where(tripdetail => tripdetail.Trip.TripId == tripId)
+            .Select(tripdetail => new ServiceDto.TripDto()
+            {
+                address = tripdetail.Address,
+                tripDate = TimeOnly.FromDateTime(tripdetail.TripDate),
+                type = tripdetail.Type
+            })
             .ToListAsync();
     }
     /*public static async Task<List<TripDetails>> GetTripDetailsAsync(int tripID, dbcontext _context)
@@ -108,19 +116,19 @@ public static class CookService
             .AverageAsync(orderMeal => (double?)orderMeal.Rating);
     }
     
-    /*public static async Task<List<dynamic>> GetCyclistEarningsAsync(int DeliveryDriver, dbcontext _context)
+    public static async Task<List<dynamic>> GetCyclistEarningsAsync(int DeliveryDriverId, dbcontext _context)
     {
         // First part: Calculate trip durations and hours worked
         var tripDurations = await _context.TripDetails
-            .Where(t1 => t1.DeliveryDriver.CyclistID == DeliveryDriver && t1.Type == "pickup")
+            .Where(t1 => t1.Trip.DeliveryDriver.CyclistID == DeliveryDriverId)
             .Join(
                 _context.TripDetails.Where(t2 => t2.Type == "delivery"),
-                t1 => t1.TripID,
-                t2 => t2.TripID,
+                t1 => t1.Trip.TripId,
+                t2 => t2.Trip.TripId,
                 (t1, t2) => new
                 {
-                    t1.TripID,
-                    t1.DeliveryDriver.CyclistID,
+                    t1.Trip.TripId,
+                    t1.Trip.DeliveryDriver.CyclistID,
                     PickupTime = t1.TripDate,
                     DeliveryTime = t2.TripDate,
                     TripDate = t1.TripDate,
@@ -135,17 +143,16 @@ public static class CookService
             .GroupBy(td => new { td.CyclistID, td.Month })
             .Select(g => new
             {
-                CyclistID = g.Key.CyclistID,
-                Month = g.Key.Month,
+                Month = DateTimeFormatInfo.CurrentInfo.GetMonthName(g.Key.Month),
                 Hours = g.Sum(td => td.HoursWorked),  // Sum the hours worked
                 Earnings = g.Sum(td => td.HoursWorked) * 150  // Calculate earnings
             })
-            .OrderBy(e => e.CyclistID)
-            .ThenBy(e => e.Month)
-            .ToList<dynamic>();  // Return as a dynamic list
+            .OrderBy(e => e.Month)
+            .ToList<dynamic>(); 
 
         return earnings;
-    }*/
+    }
+   
     /*
     public static async Task<List<dynamic>> GetCyclistEarningsAsync(int DeliveryDriver, dbcontext _context)
     {
@@ -164,32 +171,77 @@ public static class CookService
             .ToListAsync<dynamic>();
         
     }*/
-    
-    /*
-    public static async Task<List<dynamic>> GetAverageRatingForDriversAsync(dbcontext _context)
+    public static async Task<double> GetAverageRatingForDriversAsync(int driverid, dbcontext _context)
     {
-        return await _context.TripDetails
-            .Join(
-                _context.DeliveryDrivers,
-                tripDetail => tripDetail.CyclistID,
-                driver => driver.CyclistID,
-                (tripDetail, driver) => new
-                {
-                    driver.FullName,
-                    tripDetail.Rating
-                })
-            .Where(td => td.Rating.HasValue)
-            .GroupBy(td => td.FullName)
-            .Select(g => new
-            {
-                Driver = g.Key,
-                AverageRating = g.Average(td => (double?)td.Rating)
-            })
-            .OrderByDescending(dto => dto.AverageRating)
-            .ToListAsync<dynamic>();
-    }*/
+        return await _context.Trip
+            .Where(Trip => Trip.DeliveryDriver.CyclistID == driverid)
+            .AverageAsync(Trip => (double)Trip.rating);
+    }
     
     
+    //Post to add a new meal.
+    
+    //Example Query:
+    /*
+     * {
+         "Dish": "Pasta",
+         "startTime": "10:15:00",
+         "endTime": "12:30:00",
+         "price": 55,
+         "quantity": 3,
+         "cookCPR": "0987654321"
+       }
+     */
+    public static async Task AddMealAsync(ServiceDto.AddMealDto mealDto, dbcontext _context)
+    {
+        var cook = await _context.Cooks
+            .Where(cook => cook.CookCPR == mealDto.CookCPR)
+            .FirstOrDefaultAsync();
+        if (cook == null)
+        {
+            throw new Exception("Cook not found");
+        }
+        var meal = new Meal()
+        {
+            Dish = mealDto.Dish,
+            Quantity = mealDto.Quantity,
+            Price = mealDto.Price,
+            StartTime = mealDto.StartTime,
+            EndTime = mealDto.EndTime,
+            Cook = cook
+        };
+        _context.Meals.Add(meal);
+        await _context.SaveChangesAsync();
+    }
+    
+    //Update the Quantity of a Dish.
+    public static async Task UpdateQuantityAsync(ServiceDto.UpdateQuantityDto updateQuantityDto, dbcontext _context)
+    {
+        var meal = await _context.Meals
+            .Where(meal => meal.mealId == updateQuantityDto.mealId)
+            .FirstOrDefaultAsync();
+        if (meal == null)
+        {
+            throw new Exception("Meal not found");
+        }
+        
+        meal.Quantity = updateQuantityDto.Quantity;
+        await _context.SaveChangesAsync();
+    }
+    
+    public static async Task DeleteMealAsync(int mealId, dbcontext _context)
+    {
+        var meal = await _context.Meals
+            .Where(meal => meal.mealId == mealId)
+            .FirstOrDefaultAsync();
+        if (meal == null)
+        {
+            throw new Exception("Meal not found");
+        }
+        _context.Meals.Remove(meal);
+        await _context.SaveChangesAsync();
+    }
 
-   
+
+
 }

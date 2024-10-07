@@ -19,6 +19,7 @@ public class ServiceDto
         public TimeOnly StartTime { get; set; }
         public TimeOnly EndTime { get; set; }
     }
+    
 
     public class AddMealDto
     {
@@ -26,7 +27,6 @@ public class ServiceDto
         public TimeOnly StartTime { get; set; }
         public TimeOnly EndTime { get; set; }
         //Price must be above 0
-        //[Range(0, double.MaxValue, ErrorMessage = "Price must be above 0")]
         [PriceValidation]
         public decimal Price { get; set; }
         public int Quantity { get; set; }

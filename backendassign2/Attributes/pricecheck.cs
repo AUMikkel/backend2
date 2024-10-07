@@ -3,20 +3,20 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 public class PriceValidationAttribute : Attribute, IModelValidator
 {
-    public string errorMessage { get; set; } = "Price cannot be negative";
+    public string errorMessagePrice { get; set; } = "Price cannot be negative";
     public IEnumerable<ModelValidationResult> Validate(ModelValidationContext context)
     {
-        var model = context.Model as ServiceDto.AddMealDto;
-        if (model != null)
+        if (context.Model is decimal price)
         {
-            if (model.Price < 0)
+            if (price < 0)
             {
                 return new List<ModelValidationResult>
                 {
-                    new ModelValidationResult("", errorMessage)
+                    new ModelValidationResult("", errorMessagePrice)
                 };
             }
         }
         return Enumerable.Empty<ModelValidationResult>();
+        
     }
 }

@@ -1,4 +1,5 @@
 using backendassign2.Attributes;
+using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -9,16 +10,17 @@ public class PriceValidationSchemaFilter : ISchemaFilter
     public void Apply(OpenApiSchema schema, SchemaFilterContext context)
     {
         // Find the Price property that has PriceValidationAttribute
-        var priceProperty = context.Type.GetProperties()
-            .FirstOrDefault(p => p.CustomAttributes.Any(a => a.AttributeType == typeof(PriceValidationAttribute)));
+        var priceProperty = context.MemberInfo?.CustomAttributes.Where(p => 
+            p.AttributeType.Name == nameof(PriceValidationAttribute))
+            .FirstOrDefault();
 
-        if (priceProperty != null)
+        if (priceProperty is not null)
         {
-            if (schema.Properties.ContainsKey("price"))
-            {
-                var priceSchema = schema.Properties["price"];
-                priceSchema.Description += " (Custom Validation: Price cannot be negative)";
-            }
+            //schema.Extensions.Add("ValidPrice", new OpenApiBoolean(true));
+            schema.Extensions.Add("PriceCheck", new OpenApiString("Price is Valid"));
+        }
+        else {
+            schema.Extensions.Add("PriceCheck", new OpenApiString("Price is Invalid"));
         }
     }
 }

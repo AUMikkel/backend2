@@ -107,7 +107,7 @@ public class dbcontext : DbContext
             Zipcode = 1234,
             HouseNumber = 1,
             City = "City",
-            CookCPR = "1234567890"
+            //CookCPR = "1234567890"
         };
         Cook cook2 = new Cook
         {
@@ -117,7 +117,7 @@ public class dbcontext : DbContext
             Zipcode = 4321,
             HouseNumber = 2,
             City = "City",
-            CookCPR = "0987654321"
+            //CookCPR = "0987654321"
         };
         Cooks.AddRange(cook1, cook2);
         
@@ -127,8 +127,8 @@ public class dbcontext : DbContext
             Dish = "Pizza",
             Quantity = 1,
             Price = 100,
-            StartTime = new TimeOnly(12, 0),
-            EndTime = new TimeOnly(13,0)
+            //StartTime = new TimeOnly(12, 0),
+            //EndTime = new TimeOnly(13,0)
         };
         
         Meal meal2 = new Meal
@@ -137,8 +137,8 @@ public class dbcontext : DbContext
             Dish = "Pasta",
             Quantity = 2,
             Price = 200,
-            StartTime = new TimeOnly(14, 0),
-            EndTime = new TimeOnly(15,0)
+            //StartTime = new TimeOnly(14, 0),
+            //EndTime = new TimeOnly(15,0)
         };
         Meal meal3 = new Meal
         {
@@ -146,8 +146,8 @@ public class dbcontext : DbContext
             Dish = "Panini",
             Quantity = 6,
             Price = 150,
-            StartTime = new TimeOnly(17, 0),
-            EndTime = new TimeOnly(18,30)
+           // StartTime = new TimeOnly(17, 0),
+           // EndTime = new TimeOnly(18,30)
         };
         
         

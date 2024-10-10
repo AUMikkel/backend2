@@ -12,8 +12,8 @@ using backendassign2;
 namespace backendassign2.Migrations
 {
     [DbContext(typeof(dbcontext))]
-    [Migration("20241003122139_Initial")]
-    partial class Initial
+    [Migration("20241010125434_Migration1")]
+    partial class Migration1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -52,19 +52,29 @@ namespace backendassign2.Migrations
 
             modelBuilder.Entity("backendassign2.Entities.Cook", b =>
                 {
-                    b.Property<string>("CookCPR")
-                        .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
+                    b.Property<int>("CookId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CookId"));
 
                     b.Property<string>("City")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
+                    b.Property<string>("CookCPR")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
+
                     b.Property<string>("FullName")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
+
+                    b.Property<bool>("HasPassedFoodSafetyCourse")
+                        .HasColumnType("bit");
 
                     b.Property<int>("HouseNumber")
                         .HasColumnType("int");
@@ -82,7 +92,7 @@ namespace backendassign2.Migrations
                     b.Property<int>("Zipcode")
                         .HasColumnType("int");
 
-                    b.HasKey("CookCPR");
+                    b.HasKey("CookId");
 
                     b.ToTable("Cooks");
                 });
@@ -197,8 +207,8 @@ namespace backendassign2.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("mealId"));
 
-                    b.Property<string>("CookCPR")
-                        .HasColumnType("nvarchar(15)");
+                    b.Property<int>("CookId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Dish")
                         .IsRequired()
@@ -219,7 +229,7 @@ namespace backendassign2.Migrations
 
                     b.HasKey("mealId");
 
-                    b.HasIndex("CookCPR");
+                    b.HasIndex("CookId");
 
                     b.ToTable("Meals");
                 });
@@ -367,7 +377,9 @@ namespace backendassign2.Migrations
                 {
                     b.HasOne("backendassign2.Entities.Cook", "Cook")
                         .WithMany()
-                        .HasForeignKey("CookCPR");
+                        .HasForeignKey("CookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Cook");
                 });

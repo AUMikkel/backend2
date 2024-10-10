@@ -17,10 +17,7 @@ public class PriceValidationSchemaFilter : ISchemaFilter
         if (priceProperty is not null)
         {
             //schema.Extensions.Add("ValidPrice", new OpenApiBoolean(true));
-            schema.Extensions.Add("PriceCheck", new OpenApiString("Price is Valid"));
-        }
-        else {
-            schema.Extensions.Add("PriceCheck", new OpenApiString("Price is Invalid"));
+            schema.Extensions.Add("PriceCheck", new OpenApiString("Price can't be negative"));
         }
     }
 }

@@ -9,7 +9,8 @@ public class ServiceDto
     {
         public string Address { get; set; }
         public string PhoneNo { get; set; }
-        public string CookCPR { get; set; }
+        public int CookId { get; set; }
+        public bool HasPassedFoodSafetyCourse { get; set; }
     }
 
     public class MealDto
@@ -17,21 +18,21 @@ public class ServiceDto
         public string Dish { get; set; }
         public int Quantity { get; set; }
         public decimal Price { get; set; }
-        public TimeOnly StartTime { get; set; }
-        public TimeOnly EndTime { get; set; }
+        public string StartTime { get; set; }
+        public string EndTime { get; set; }
     }
     
 
     public class AddMealDto
     {
         public string Dish { get; set; }
-        public TimeOnly StartTime { get; set; }
-        public TimeOnly EndTime { get; set; }
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
         //Price must be above 0
         [PriceValidation]
         public decimal Price { get; set; }
         public int Quantity { get; set; }
-        public string CookCPR { get; set; }
+        public int CookId { get; set; }
         
     }
 

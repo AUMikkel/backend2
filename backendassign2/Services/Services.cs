@@ -22,22 +22,22 @@ public static class CookService
             {
                 Address = cook.StreetName + " " + cook.HouseNumber + ", " + cook.Zipcode + ", " + cook.City,
                 PhoneNo = cook.PhoneNo,
-                CookCPR = cook.CookCPR
+                CookId = cook.CookId,
+                HasPassedFoodSafetyCourse = cook.HasPassedFoodSafetyCourse
             })
             .ToListAsync();
     }
-    public static async Task<List<ServiceDto.MealDto>> GetDishesByCookAsync(string cookCPR, dbcontext _context)
+    public static async Task<List<ServiceDto.MealDto>> GetDishesByCookAsync(int cookId, dbcontext _context)
     {
         return await _context.Meals
-            .Where(meal => meal.Cook.CookCPR == cookCPR)
+            .Where(meal => meal.Cook.CookId == cookId)
             .Select(meal => new ServiceDto.MealDto()
             {
                 Dish = meal.Dish,
                 Quantity = meal.Quantity,
                 Price = meal.Price,
-                StartTime = meal.StartTime,
-                EndTime = meal.EndTime
-                
+                StartTime = meal.StartTime.ToString("ddMMyyyy HHmm"),
+                EndTime = meal.EndTime.ToString("ddMMyyyy HHmm")
             })
             .ToListAsync();
     }
@@ -109,10 +109,10 @@ public static class CookService
             .OrderBy(tripDetail => tripDetail.Time)
             .ToListAsync();
     }*/
-    public static async Task<double?> GetAverageRatingForCookAsync(string cookCPR, dbcontext _context)
+    public static async Task<double?> GetAverageRatingForCookAsync(int cookId, dbcontext _context)
     {
         return await _context.OrderMeals
-            .Where(orderMeal => orderMeal.Meal.Cook.CookCPR == cookCPR)
+            .Where(orderMeal => orderMeal.Meal.Cook.CookId == cookId)
             .AverageAsync(orderMeal => (double?)orderMeal.Rating);
     }
     
@@ -195,7 +195,7 @@ public static class CookService
     public static async Task AddMealAsync(ServiceDto.AddMealDto AddmealDto, dbcontext _context)
     {
         var cook = await _context.Cooks
-            .Where(cook => cook.CookCPR == AddmealDto.CookCPR)
+            .Where(cook => cook.CookId == AddmealDto.CookId)
             .FirstOrDefaultAsync();
         if (cook == null)
         {

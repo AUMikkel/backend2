@@ -5,10 +5,13 @@ namespace backendassign2.Entities;
 
 public class Cook
 {
-    [Key] // Marks the cookCPR as the primary key
-    [MaxLength(15)] // Equivalent to VARCHAR(15)
-    public string CookCPR { get; set; }
-
+    //[Key]
+    //[MaxLength(15)] // Equivalent to VARCHAR(15)
+    //public string CookCPR { get; set; }
+    
+    [Key]
+    public int CookId { get; set; }
+    
     [MaxLength(255)] // Equivalent to VARCHAR(255)
     public string FullName { get; set; }
     
@@ -27,4 +30,6 @@ public class Cook
 
     [MaxLength(15)] // Equivalent to VARCHAR(15)
     public string PhoneNo { get; set; }
+    
+    public bool HasPassedFoodSafetyCourse { get; set; } 
 }

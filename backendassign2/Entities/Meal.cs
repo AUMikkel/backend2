@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.InteropServices.JavaScript;
 
 namespace backendassign2.Entities;
 
@@ -16,9 +17,9 @@ public class Meal
     [MaxLength(255)]
     public string Dish { get; set; }
 
-    public TimeOnly StartTime { get; set; }
+    public DateTime StartTime { get; set; }
 
-    public TimeOnly EndTime { get; set; }
+    public DateTime EndTime { get; set; }
         
     [Column(TypeName = "decimal(10,2)")]
     public decimal Price { get; set; }

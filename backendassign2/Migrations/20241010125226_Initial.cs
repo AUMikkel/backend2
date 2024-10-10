@@ -26,6 +26,8 @@ namespace backendassign2.Migrations
                 name: "Cooks",
                 columns: table => new
                 {
+                    CookId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     CookCPR = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false),
                     FullName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     StreetName = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
@@ -36,7 +38,7 @@ namespace backendassign2.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Cooks", x => x.CookCPR);
+                    table.PrimaryKey("PK_Cooks", x => x.CookId);
                 });
 
             migrationBuilder.CreateTable(
@@ -81,16 +83,17 @@ namespace backendassign2.Migrations
                     EndTime = table.Column<TimeOnly>(type: "time", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
-                    CookCPR = table.Column<string>(type: "nvarchar(15)", nullable: true)
+                    CookId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Meals", x => x.mealId);
                     table.ForeignKey(
-                        name: "FK_Meals_Cooks_CookCPR",
-                        column: x => x.CookCPR,
+                        name: "FK_Meals_Cooks_CookId",
+                        column: x => x.CookId,
                         principalTable: "Cooks",
-                        principalColumn: "CookCPR");
+                        principalColumn: "CookId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -265,9 +268,9 @@ namespace backendassign2.Migrations
                 column: "BikeTypeBike");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Meals_CookCPR",
+                name: "IX_Meals_CookId",
                 table: "Meals",
-                column: "CookCPR");
+                column: "CookId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_OrderMeals_MealId",

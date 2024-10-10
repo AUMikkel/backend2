@@ -19,11 +19,11 @@ public class MenuController : ControllerBase
     {
         return await CookService.GetCooks(name, _context);
     }
-    [HttpGet("GetDishesByCook/{cookCPR}")]
+    [HttpGet("GetDishesByCook/{cookId}")]
     public async Task<IEnumerable<ServiceDto.MealDto
-    >> GetDishesByCook(string cookCPR)
+    >> GetDishesByCook(int cookId)
     {
-        return await CookService.GetDishesByCookAsync(cookCPR, _context);
+        return await CookService.GetDishesByCookAsync(cookId, _context);
     }
     [HttpGet("GetOrderDetails")]
      public async Task<IEnumerable<ServiceDto.OrderMealDto>> GetOrderDetails(int orderId)
@@ -37,9 +37,9 @@ public class MenuController : ControllerBase
     }
     
     [HttpGet("GetAverageRatingForCookAsync")]
-    public async Task<double?> GetAverageRatingForCookAsync(string cookCPR)
+    public async Task<double?> GetAverageRatingForCookAsync(int cookId)
     {
-        return await CookService.GetAverageRatingForCookAsync(cookCPR, _context);
+        return await CookService.GetAverageRatingForCookAsync(cookId, _context);
     }
     
     [HttpGet("GetCyclistEarningsAsync")]

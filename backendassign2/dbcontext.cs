@@ -22,9 +22,7 @@ public class dbcontext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Configure composite keys
-        // modelBuilder.Entity<Meal>()
-        //     .HasKey(m => new { m.CookCPR, m.Dish });
+        
 
         modelBuilder.Entity<OrderMeal>()
             .HasKey(om => new { om.OrderId, om.MealId });
@@ -36,14 +34,6 @@ public class dbcontext : DbContext
             .HasOne(m => m.Meal)
             .WithMany(b => b.OrderMeal);
         
-            
-        
-        // modelBuilder.Entity<CustomerOrder>()
-        //     .HasMany(c => c.Meal)
-        //     .WithMany(m => m.CustomerOrder)
-        //     .UsingEntity(x => x.ToTable("OrderMeal").Property<int>("CustomersQuantity"))
-        //     .Property<int>("Rating");
-            
         
         base.OnModelCreating(modelBuilder);
     }
@@ -74,7 +64,7 @@ public class dbcontext : DbContext
             City = "City",
             PaymentOption = cash
         };
-        //customer1.PaymentOption = cash;
+       
         Customer customer2 = new Customer
         {
             FullName = "Jane Doe",
@@ -85,7 +75,7 @@ public class dbcontext : DbContext
             City = "City",
             PaymentOption = creditCard
         };
-       //customer2.PaymentOption = creditCard;
+       
         Customer customer3 = new Customer
         {
             FullName = "Alice Doe",
@@ -96,7 +86,7 @@ public class dbcontext : DbContext
             City = "City",
             PaymentOption = mobilePay
         };
-        //customer3.PaymentOption = mobilePay;
+       
         Customers.AddRange(customer1, customer2, customer3);
         
         Cook cook1 = new Cook
@@ -106,8 +96,7 @@ public class dbcontext : DbContext
             StreetName = "Main Street",
             Zipcode = 1234,
             HouseNumber = 1,
-            City = "City",
-            //CookCPR = "1234567890"
+            City = "City"
         };
         Cook cook2 = new Cook
         {
@@ -116,8 +105,7 @@ public class dbcontext : DbContext
             StreetName = "Second Street",
             Zipcode = 4321,
             HouseNumber = 2,
-            City = "City",
-            //CookCPR = "0987654321"
+            City = "City"
         };
         Cooks.AddRange(cook1, cook2);
         
@@ -126,9 +114,7 @@ public class dbcontext : DbContext
             Cook = cook1,
             Dish = "Pizza",
             Quantity = 1,
-            Price = 100,
-            //StartTime = new TimeOnly(12, 0),
-            //EndTime = new TimeOnly(13,0)
+            Price = 100
         };
         
         Meal meal2 = new Meal
@@ -136,18 +122,14 @@ public class dbcontext : DbContext
             Cook = cook2,
             Dish = "Pasta",
             Quantity = 2,
-            Price = 200,
-            //StartTime = new TimeOnly(14, 0),
-            //EndTime = new TimeOnly(15,0)
+            Price = 200
         };
         Meal meal3 = new Meal
         {
             Cook = cook2,
             Dish = "Panini",
             Quantity = 6,
-            Price = 150,
-           // StartTime = new TimeOnly(17, 0),
-           // EndTime = new TimeOnly(18,30)
+            Price = 150
         };
         
         

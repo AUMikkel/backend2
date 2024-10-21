@@ -6,15 +6,12 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 var conn = builder.Configuration.GetConnectionString("DefaultConnection");
-//var databaseName = builder.Configuration["DatabaseSettings:DatabaseName"];
 var databaseName = "Assignment2";
-// Replace placeholder with actual database name
+// Replace placeholder with actual database name in connection string.
 conn = conn.Replace("{DatabaseName}", databaseName);
 builder.Services.AddMvc();
 
@@ -25,11 +22,11 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 
-// Register DbContext with the dependency injection container
+// Register DbContext
 builder.Services.AddDbContext<dbcontext>(options =>
     options.UseSqlServer(conn));
 var app = builder.Build();
-//tes
+
 //Seed the database
 using (var scope = app.Services.CreateScope())
 {

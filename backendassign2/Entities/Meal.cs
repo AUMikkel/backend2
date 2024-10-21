@@ -9,11 +9,6 @@ public class Meal
     [Key]
     public int mealId { get; set; }
     
-    //[Key, Column(Order = 1)]
-    // [MaxLength(15)]
-    // public string CookCPR { get; set; }
-
-    //[Key, Column(Order = 2)]
     [MaxLength(255)]
     public string Dish { get; set; }
 

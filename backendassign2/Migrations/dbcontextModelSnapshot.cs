@@ -34,7 +34,7 @@ namespace backendassign2.Migrations
 
                     b.HasIndex("mealId");
 
-                    b.ToTable("CustomerOrderMeal");
+                    b.ToTable("CustomerOrderMeal", (string)null);
                 });
 
             modelBuilder.Entity("backendassign2.Entities.BikeType", b =>
@@ -44,7 +44,7 @@ namespace backendassign2.Migrations
 
                     b.HasKey("Bike");
 
-                    b.ToTable("BikeType");
+                    b.ToTable("BikeType", (string)null);
                 });
 
             modelBuilder.Entity("backendassign2.Entities.Cook", b =>
@@ -86,7 +86,7 @@ namespace backendassign2.Migrations
 
                     b.HasKey("CookId");
 
-                    b.ToTable("Cooks");
+                    b.ToTable("Cooks", (string)null);
                 });
 
             modelBuilder.Entity("backendassign2.Entities.Customer", b =>
@@ -131,7 +131,7 @@ namespace backendassign2.Migrations
 
                     b.HasIndex("PaymentOptionOption");
 
-                    b.ToTable("Customers");
+                    b.ToTable("Customers", (string)null);
                 });
 
             modelBuilder.Entity("backendassign2.Entities.CustomerOrder", b =>
@@ -160,7 +160,7 @@ namespace backendassign2.Migrations
 
                     b.HasIndex("TripId");
 
-                    b.ToTable("CustomerOrders");
+                    b.ToTable("CustomerOrders", (string)null);
                 });
 
             modelBuilder.Entity("backendassign2.Entities.DeliveryDriver", b =>
@@ -188,7 +188,7 @@ namespace backendassign2.Migrations
 
                     b.HasIndex("BikeTypeBike");
 
-                    b.ToTable("DeliveryDrivers");
+                    b.ToTable("DeliveryDrivers", (string)null);
                 });
 
             modelBuilder.Entity("backendassign2.Entities.Meal", b =>
@@ -207,8 +207,8 @@ namespace backendassign2.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<DateTime>("EndTime")
-                        .HasColumnType("datetime2");
+                    b.Property<TimeOnly>("EndTime")
+                        .HasColumnType("time");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(10,2)");
@@ -216,14 +216,14 @@ namespace backendassign2.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("StartTime")
-                        .HasColumnType("datetime2");
+                    b.Property<TimeOnly>("StartTime")
+                        .HasColumnType("time");
 
                     b.HasKey("mealId");
 
                     b.HasIndex("CookId");
 
-                    b.ToTable("Meals");
+                    b.ToTable("Meals", (string)null);
                 });
 
             modelBuilder.Entity("backendassign2.Entities.OrderMeal", b =>
@@ -244,7 +244,7 @@ namespace backendassign2.Migrations
 
                     b.HasIndex("MealId");
 
-                    b.ToTable("OrderMeals");
+                    b.ToTable("OrderMeals", (string)null);
                 });
 
             modelBuilder.Entity("backendassign2.Entities.PaymentOption", b =>
@@ -254,7 +254,7 @@ namespace backendassign2.Migrations
 
                     b.HasKey("Option");
 
-                    b.ToTable("PaymentOptions");
+                    b.ToTable("PaymentOptions", (string)null);
                 });
 
             modelBuilder.Entity("backendassign2.Entities.Trip", b =>
@@ -275,7 +275,7 @@ namespace backendassign2.Migrations
 
                     b.HasIndex("DeliveryDriverCyclistID");
 
-                    b.ToTable("Trip");
+                    b.ToTable("Trip", (string)null);
                 });
 
             modelBuilder.Entity("backendassign2.Entities.TripDetails", b =>
@@ -308,7 +308,7 @@ namespace backendassign2.Migrations
 
                     b.HasIndex("TripId");
 
-                    b.ToTable("TripDetails");
+                    b.ToTable("TripDetails", (string)null);
                 });
 
             modelBuilder.Entity("CustomerOrderMeal", b =>

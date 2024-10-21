@@ -10,13 +10,9 @@ public class CustomerOrder
     
     public int Price { get; set; }
 
-    //public int CustomerID { get; set; }
-        
-    //[Column(TypeName = "numeric(2,0)")]
-    //public decimal? Rating { get; set; } // Numeric(2,0) can be represented as decimal
+   
     public DateTime Timestamp { get; set; }
 
-    // Navigation property
     public Customer Customer { get; set; }
     
     public ICollection<Meal> Meal { get; set; }

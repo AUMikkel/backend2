@@ -41,22 +41,7 @@ public static class CookService
             })
             .ToListAsync();
     }
-    /*public static async Task<List<OrderMeal>> GetOrderDetailsAsync(int orderId, dbcontext _context)
-    {
-        return await _context.OrderMeals
-            .Where(orderMeal => orderMeal.OrderId == orderId)
-            .Join(
-                _context.Cooks,
-                orderMeal => orderMeal.OrderId,
-                cook => cook.CookCPR,
-                (orderMeal, cook) => new OrderMeal
-                {
-                    Dish = orderMeal.Dish,
-                    Quantity = orderMeal.Quantity,
-                    CookCPR = cook.CookCPR
-                })
-            .ToListAsync();
-    }*/
+    
     
     public static async Task<List<ServiceDto.OrderMealDto>> GetOrderDetailsAsync(int orderId, dbcontext _context)
     {
@@ -74,22 +59,7 @@ public static class CookService
                 })
             .ToListAsync();
     }
-    /*public static async Task<List<TripDetails>> GetTripDetailsAsync(int tripId, dbcontext _context)
-    {
-        return await _context.TripDetails
-            .Where(tripDetail => tripDetail.TripID == tripId)
-            .Where(TripDetails => TripDetails.Type == "Delivery")
-            .Select(TripDetails => new TripDetails()
-            {
-                CustomerOrder = TripDetails.CustomerOrder,
-                Address = TripDetails.Address,
-                TripDate = TripDetails.TripDate,
-                Type = TripDetails.Type
-                
-            } )
-            .OrderBy(tripDetail => tripDetail.TripDate)
-            .ToListAsync();
-    }*/
+    
     public static async Task<List<ServiceDto.TripDto>> GetTripDetailsAsync(int tripId, dbcontext _context)
     {
         return await _context.TripDetails
@@ -102,13 +72,7 @@ public static class CookService
             })
             .ToListAsync();
     }
-    /*public static async Task<List<TripDetails>> GetTripDetailsAsync(int tripID, dbcontext _context)
-    {
-        return await _context.TripDetails
-            .Where(tripDetail => tripDetail.TripID == tripID)
-            .OrderBy(tripDetail => tripDetail.Time)
-            .ToListAsync();
-    }*/
+    
     public static async Task<double?> GetAverageRatingForCookAsync(int cookId, dbcontext _context)
     {
         return await _context.OrderMeals
@@ -118,7 +82,7 @@ public static class CookService
     
     public static async Task<List<dynamic>> GetCyclistEarningsAsync(int DeliveryDriverId, dbcontext _context)
     {
-        // First part: Calculate trip durations and hours worked
+        // Calculate trip durations and hours worked
         var tripDurations = await _context.TripDetails
             .Where(t1 => t1.Trip.DeliveryDriver.CyclistID == DeliveryDriverId)
             .Join(
@@ -138,13 +102,13 @@ public static class CookService
             )
             .ToListAsync();
 
-        // Second part: Group by cyclist and month, then calculate total hours and earnings
+        // Group by cyclist and month, then calculate total hours and earnings
         var earnings = tripDurations
             .GroupBy(td => new { td.CyclistID, td.Month })
             .Select(g => new
             {
                 Month = DateTimeFormatInfo.CurrentInfo.GetMonthName(g.Key.Month),
-                Hours = g.Sum(td => td.HoursWorked),  // Sum the hours worked
+                Hours = g.Sum(td => td.HoursWorked),  // Calculate hours
                 Earnings = g.Sum(td => td.HoursWorked) * 150  // Calculate earnings
             })
             .OrderBy(e => e.Month)
@@ -153,33 +117,13 @@ public static class CookService
         return earnings;
     }
    
-    /*
-    public static async Task<List<dynamic>> GetCyclistEarningsAsync(int DeliveryDriver, dbcontext _context)
-    {
-        return await _context.TripDetails
-            .Where(td => td.DeliveryDriver.CyclistID == DeliveryDriver)
-            .GroupBy(td => new { td.DeliveryDriver.CyclistID, td.TripDate })
-            .Select(g => new
-            {
-                CyclistID = g.Key.CyclistID,
-                Month = g.Key.TripDate.Month,
-                Hours = g.Sum(td => (double?)(td.TripDate - td.TripDate).TotalMinutes / 60.0),
-                Earnings = g.Sum(td => (double?)(td.TripDate - td.TripDate).TotalMinutes / 60.0) * 150
-            })
-            .OrderBy(e => e.CyclistID)
-            .ThenBy(e => e.Month)
-            .ToListAsync<dynamic>();
-        
-    }*/
+   
     public static async Task<double> GetAverageRatingForDriversAsync(int driverid, dbcontext _context)
     {
         return await _context.Trip
             .Where(Trip => Trip.DeliveryDriver.CyclistID == driverid)
             .AverageAsync(Trip => (double)Trip.rating);
     }
-    
-    
-    //Post to add a new meal.
     
     //Example Query:
     /*
@@ -214,7 +158,7 @@ public static class CookService
         await _context.SaveChangesAsync();
     }
     
-    //Update the Quantity of a Dish.
+    
     public static async Task UpdateQuantityAsync(ServiceDto.UpdateQuantityDto updateQuantityDto, dbcontext _context)
     {
         var meal = await _context.Meals

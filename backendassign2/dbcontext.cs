@@ -114,7 +114,10 @@ public class dbcontext : DbContext
             Cook = cook1,
             Dish = "Pizza",
             Quantity = 1,
-            Price = 100
+            Price = 100,
+            StartTime = new DateTime(2024,08,12, 12,0,0),
+            EndTime = new DateTime(2024,08,12, 18,0,0)
+            
         };
         
         Meal meal2 = new Meal
@@ -122,14 +125,18 @@ public class dbcontext : DbContext
             Cook = cook2,
             Dish = "Pasta",
             Quantity = 2,
-            Price = 200
+            Price = 200,
+            StartTime = new DateTime(2024,08,12, 12,0,0),
+            EndTime = new DateTime(2024,08,12, 18,0,0)
         };
         Meal meal3 = new Meal
         {
             Cook = cook2,
             Dish = "Panini",
             Quantity = 6,
-            Price = 150
+            Price = 150,
+            StartTime = new DateTime(2024,08,12, 12,0,0),
+            EndTime = new DateTime(2024,08,12, 18,0,0)
         };
         
         

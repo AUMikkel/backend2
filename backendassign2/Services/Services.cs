@@ -36,8 +36,8 @@ public static class CookService
                 Dish = meal.Dish,
                 Quantity = meal.Quantity,
                 Price = meal.Price,
-                StartTime = meal.StartTime.ToString("ddMMyyyy HHmm"),
-                EndTime = meal.EndTime.ToString("ddMMyyyy HHmm")
+                StartTime = meal.StartTime.ToString("dd-MM-yyyy HH:mm"),
+                EndTime = meal.EndTime.ToString("dd-MM-yyyy HH:mm")
             })
             .ToListAsync();
     }
@@ -128,12 +128,12 @@ public static class CookService
     //Example Query:
     /*
      * {
-         "Dish": "Pasta",
-         "startTime": "10:15:00",
-         "endTime": "12:30:00",
-         "price": 55,
-         "quantity": 3,
-         "cookCPR": "0987654321"
+         "dish": "Pasta",
+         "startTime": "2024-10-21T09:11:23.158Z",
+         "endTime": "2024-10-21T09:11:23.158Z",
+         "price": -1,
+         "quantity": 5,
+         "cookId": 1
        }
      */
     public static async Task AddMealAsync(ServiceDto.AddMealDto AddmealDto, dbcontext _context)

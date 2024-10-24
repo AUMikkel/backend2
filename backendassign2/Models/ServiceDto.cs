@@ -60,11 +60,6 @@ public class ServiceDto
         public string type { get; set; }
     }
 
-    public class EarningsDto
-    {
-        public string month { get; set; }
-        public decimal hours { get; set; }
-        public decimal earnings { get; set; }
-    }
+   
     
 }

@@ -9,11 +9,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddMvc();
 var conn = builder.Configuration.GetConnectionString("DefaultConnection");
 var databaseName = "Assignment2";
 // Replace placeholder with actual database name in connection string.
 conn = conn.Replace("{DatabaseName}", databaseName);
-builder.Services.AddMvc();
+
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -33,7 +34,7 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     var context = services.GetRequiredService<dbcontext>();
     context.Database.EnsureCreated();
-    //context.Seed();
+    context.Seed();
 }
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

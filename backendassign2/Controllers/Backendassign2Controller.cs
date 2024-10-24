@@ -19,6 +19,7 @@ public class MenuController : ControllerBase
     {
         return await CookService.GetCooks(name, _context);
     }
+    
     [HttpGet("GetDishesByCook/{cookId}")]
     public async Task<IEnumerable<ServiceDto.MealDto
     >> GetDishesByCook(int cookId)

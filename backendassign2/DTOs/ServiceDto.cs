@@ -3,7 +3,7 @@ using backendassign2.Attributes;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace backendassign2.Models;
+namespace backendassign2.DTOs;
 
 public class ServiceDto
 {

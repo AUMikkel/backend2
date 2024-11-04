@@ -3,6 +3,7 @@ using backendassign2.Services;
 using backendassign2.Swashbuckle;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +23,13 @@ builder.Services.AddSwaggerGen(c =>
     c.SchemaFilter<PriceValidationSchemaFilter>();
 });
 
+builder.Host.UseSerilog((context, config) =>
+{
+    config.ReadFrom.Configuration(context.Configuration);
+    
+});
+
+
 
 // Register DbContext
 builder.Services.AddDbContext<dbcontext>(options =>
@@ -34,7 +42,7 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     var context = services.GetRequiredService<dbcontext>();
     context.Database.EnsureCreated();
-    context.Seed();
+    //context.Seed();
 }
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

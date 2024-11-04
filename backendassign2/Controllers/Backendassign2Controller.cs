@@ -2,6 +2,7 @@ using backendassign2.Entities;
 using backendassign2.Models;
 using backendassign2.Services;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace backendassign2.Controllers;
 
@@ -10,19 +11,24 @@ namespace backendassign2.Controllers;
 public class MenuController : ControllerBase
 {
     private readonly dbcontext _context;
-    public MenuController(dbcontext context)
+    private readonly ILogger<MenuController> _logger;
+    public MenuController(dbcontext context, ILogger<MenuController> logger)
     {
         _context = context;
+        _logger = logger;
     }
+    
+    
+    
     [HttpGet("GetCooks")]
     public async Task<IEnumerable<ServiceDto.CookDto>> Get(string name)
     {
+        _logger.LogInformation("Log message {object}", new {message = "success", age = 22, passed = true});
         return await CookService.GetCooks(name, _context);
     }
     
     [HttpGet("GetDishesByCook/{cookId}")]
-    public async Task<IEnumerable<ServiceDto.MealDto
-    >> GetDishesByCook(int cookId)
+    public async Task<IEnumerable<ServiceDto.MealDto>> GetDishesByCook(int cookId)
     {
         return await CookService.GetDishesByCookAsync(cookId, _context);
     }
@@ -58,6 +64,7 @@ public class MenuController : ControllerBase
     [HttpPost("AddMeal")]
     public async Task<ActionResult<ServiceDto.AddMealDto>> AddMeal(ServiceDto.AddMealDto meal)
     {
+        _logger.LogInformation("Adding meal");
         await CookService.AddMealAsync(meal, _context);
         return Ok();
     }
@@ -75,4 +82,13 @@ public class MenuController : ControllerBase
         await CookService.DeleteMealAsync(mealId, _context);
         return Ok();
     }
+    
+    
+    [HttpGet("SearchLogs")]
+    public async Task<IEnumerable<ServiceDto.Log>> SearchLogs(DateTime StartTime, DateTime EndTime)
+    {
+        _logger.LogInformation("Searching logs");
+        return await CookService.SearchLogsAsync(StartTime, EndTime);
+    }
+    
 }

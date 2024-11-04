@@ -6,6 +6,9 @@ using backendassign2.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic;
+using MongoDB.Driver;
+using Serilog;
+using ServiceDto = backendassign2.Models.ServiceDto;
 
 namespace backendassign2.Services;
 
@@ -185,6 +188,31 @@ public static class CookService
         _context.Meals.Remove(meal);
         await _context.SaveChangesAsync();
     }
+    
+    //Search Logs in MongoDB
+    public static async Task<List<ServiceDto.Log>> SearchLogsAsync(DateTime startDate, DateTime endDate, string search = null)
+    {
+        var client = new MongoClient("mongodb://localhost:27017");
+        var database = client.GetDatabase("assign3");
+        var logsCollection = database.GetCollection<ServiceDto.Log>("logs");
+
+        // Define the date range filter on Timestamp
+        var dateFilter = Builders<ServiceDto.Log>.Filter.Gte(log => log.Timestamp, startDate) &
+                         Builders<ServiceDto.Log>.Filter.Lte(log => log.Timestamp, endDate);
+
+        // Optionally add a text search filter if a search term is provided
+        var filter = dateFilter;
+        if (!string.IsNullOrEmpty(search))
+        {
+            var textFilter = Builders<ServiceDto.Log>.Filter.Text(search);
+            filter = Builders<ServiceDto.Log>.Filter.And(dateFilter, textFilter);
+        }
+
+        // Fetch logs within the time interval (and matching the search term, if provided)
+        var logs = await logsCollection.Find(filter).ToListAsync();
+        return logs;
+    }
+    
 
 
 

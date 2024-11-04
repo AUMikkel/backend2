@@ -134,5 +134,5 @@ _NCrunch*
 
 .fake
 
-bin/
-obj/
+.bin/
+.obj/

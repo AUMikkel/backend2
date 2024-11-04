@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using backendassign2.Attributes;
 
-namespace backendassign2.Models;
+namespace backendassign2.DTOs;
 
 public class ServiceDto
 {

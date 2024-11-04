@@ -2,7 +2,7 @@ using System.Globalization;
 using backendassign2.Entities;
 using System.Linq;
 using System.Runtime.Serialization;
-using backendassign2.Models;
+using backendassign2.DTOs;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic;

@@ -1,4 +1,4 @@
-using backendassign2.Models;
+using backendassign2.DTOs;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace backendassign2.Attributes;

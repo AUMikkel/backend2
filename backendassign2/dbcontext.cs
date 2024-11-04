@@ -1,8 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using backendassign2.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 namespace backendassign2;
 
-public class dbcontext : DbContext
+public class dbcontext : IdentityDbContext<ApiUser>
 {
     public dbcontext(DbContextOptions<dbcontext> options) : base(options)
     {
@@ -18,6 +19,7 @@ public class dbcontext : DbContext
     public DbSet<PaymentOption> PaymentOptions { get; set; }
     public DbSet<BikeType> BikeType { get; set; }
     public DbSet<Trip> Trip { get; set; }
+    public DbSet<ApiUser> ApiUsers { get; set; }
     
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -1,5 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using backendassign2.Attributes;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace backendassign2.DTOs;
 
@@ -58,6 +60,43 @@ public class ServiceDto
         public string address { get; set; }
         public TimeOnly tripDate { get; set; }
         public string type { get; set; }
+    }
+    
+    [BsonIgnoreExtraElements]
+    public class LogDto
+    {
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string? Id { get; set; }
+        
+        [BsonElement("Timestamp")]
+        public DateTime Timestamp { get; set; }
+
+        [BsonElement("Level")]
+        public string Level { get; set; } = "";
+
+        [BsonElement("Properties")] 
+        public LogProperties Properties { get; set; } = new LogProperties();
+
+    }
+    [BsonIgnoreExtraElements]
+    public class LogProperties
+    {
+        
+        [BsonElement("LogInfo")]
+        public LogInfo LogInfo { get; set; }
+    }
+    [BsonIgnoreExtraElements]
+    public class LogInfo
+    {
+        [BsonElement("Operation")]
+        public string Operation { get; set; } = "";
+        
+        [BsonElement("Timestamp")]
+        public DateTime Timestamp { get; set; }
+        
+        [BsonElement("User")]
+        public string User { get; set; } = "";
     }
 
    

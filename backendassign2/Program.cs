@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using backendassign2.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,8 @@ var conn = builder.Configuration.GetConnectionString("DefaultConnection");
 var databaseName = "Assignment2";
 // Replace placeholder with actual database name in connection string.
 conn = conn.Replace("{DatabaseName}", databaseName);
+builder.Services.Configure<MongoDBSettings>(builder.Configuration.GetSection("MongoDBSettings"));
+builder.Services.AddSingleton<MongoLogService>();
 
 
 builder.Services.AddSwaggerGen(c =>
@@ -50,6 +53,13 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
+
+builder.Host.UseSerilog((context, config) =>
+{
+    config.ReadFrom.Configuration(context.Configuration);
+    
+});
+
 
 
 // Register DbContext

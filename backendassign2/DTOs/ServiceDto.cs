@@ -61,38 +61,43 @@ public class ServiceDto
         public TimeOnly tripDate { get; set; }
         public string type { get; set; }
     }
-    public class Log
+    
+    [BsonIgnoreExtraElements]
+    public class LogDto
     {
         [BsonId]
-        public ObjectId Id { get; set; }
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string? Id { get; set; }
+        
+        [BsonElement("Timestamp")]
+        public DateTime Timestamp { get; set; }
 
-        [BsonElement("Timestamp")]  // Ensure the name matches the MongoDB field name if it's different
+        [BsonElement("Level")]
+        public string Level { get; set; } = "";
+
+        [BsonElement("Properties")] 
+        public LogProperties Properties { get; set; } = new LogProperties();
+
+    }
+    [BsonIgnoreExtraElements]
+    public class LogProperties
+    {
+        
+        [BsonElement("LogInfo")]
+        public LogInfo LogInfo { get; set; }
+    }
+    [BsonIgnoreExtraElements]
+    public class LogInfo
+    {
+        [BsonElement("Operation")]
+        public string Operation { get; set; } = "";
+        
+        [BsonElement("Timestamp")]
         public DateTime Timestamp { get; set; }
         
-        
-        public string Level { get; set; }
-        public string MessageTemplate { get; set; }
-        public string RenderedMessage { get; set; }
-
-        public Properties Properties { get; set; }
+        [BsonElement("User")]
+        public string User { get; set; } = "";
     }
-
-    public class Properties
-    {
-        public string EnvName { get; set; }
-        public string SourceContext { get; set; }
-        public string UtcTimestamp { get; set; }
-        public string address { get; set; }  // Added to match "address" field from MongoDB
-
-        public EventId EventId { get; set; }  // Define EventId as a nested object
-    }
-
-    public class EventId
-    {
-        public int Id { get; set; }     // Matches the "Id" field in EventId object
-        public string Name { get; set; } // Matches the "Name" field in EventId object
-    }
-    
 
    
     

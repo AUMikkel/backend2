@@ -19,7 +19,8 @@ var conn = builder.Configuration.GetConnectionString("DefaultConnection");
 var databaseName = "Assignment2";
 // Replace placeholder with actual database name in connection string.
 conn = conn.Replace("{DatabaseName}", databaseName);
-
+builder.Services.Configure<MongoDBSettings>(builder.Configuration.GetSection("MongoDBSettings"));
+builder.Services.AddSingleton<MongoLogService>();
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -49,7 +50,7 @@ builder.Services.AddIdentity<ApiUser, IdentityRole>(option =>
     })
     .AddEntityFrameworkStores<dbcontext>();
 // Add the authentication service
-builder.Services.AddAuthentication(options => 
+/*builder.Services.AddAuthentication(options => 
     {
     options.DefaultAuthenticateScheme =
     options.DefaultChallengeScheme =
@@ -70,7 +71,7 @@ builder.Services.AddAuthentication(options =>
             System.Text.Encoding.UTF8.GetBytes(
                 builder.Configuration["JWT:SigningKey"]))
         };
-});
+});*/
 
 
 var app = builder.Build();
@@ -81,7 +82,7 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     var context = services.GetRequiredService<dbcontext>();
     context.Database.EnsureCreated();
-    context.Seed();
+    //context.Seed();
 }
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

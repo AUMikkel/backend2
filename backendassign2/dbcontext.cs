@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using backendassign2.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNet.Identity;
 namespace backendassign2;
 
 public class dbcontext : IdentityDbContext<ApiUser>

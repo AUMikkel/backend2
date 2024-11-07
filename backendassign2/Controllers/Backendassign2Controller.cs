@@ -2,11 +2,13 @@ using backendassign2.Entities;
 using backendassign2.DTOs;
 using backendassign2.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace backendassign2.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class MenuController : ControllerBase
 {
     private readonly dbcontext _context;

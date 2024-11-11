@@ -189,7 +189,7 @@ public static class CookService
         await _context.SaveChangesAsync();
     }
     
-    //Search Logs in MongoDB
+    //SearchController Logs in MongoDB
     public static async Task<List<ServiceDto.LogDto>> SearchLogsAsync(DateTime startDate, DateTime endDate, string search = null)
     {
         var client = new MongoClient("mongodb://localhost:27017");

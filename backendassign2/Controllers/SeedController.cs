@@ -9,14 +9,12 @@ using System.Security.Claims;
 namespace backendassign2.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/")]
 public class SeedController : ControllerBase
 {
     private readonly ILogger<AccountController> _logger;
     private readonly UserManager<ApiUser> _userManager;
-    public SeedController(dbcontext context,
-                            ILogger<AccountController> logger,
-                            UserManager<ApiUser> userManager)
+    public SeedController(dbcontext context, ILogger<AccountController> logger, UserManager<ApiUser> userManager)
     {
         _logger = logger;
         _userManager = userManager;
@@ -33,6 +31,9 @@ public class SeedController : ControllerBase
 
         const string cookEmail = "cook@localhost";
         const string cookPassword = "Cook123!";
+        
+        const string cookEmail2 = "cook@localhost2";
+        const string cookPassword2 = "Cook123!";
 
         const string cyclistEmail = "cyclist@localhost";
         const string cyclistPassword = "Cyclist123!";
@@ -92,7 +93,7 @@ public class SeedController : ControllerBase
         if (_userManager.FindByNameAsync(cookEmail).Result == null)
         {
             var cookUser = new ApiUser();
-            cookUser.FullName = "Cook";
+            cookUser.FullName = "Jane Cook";
             cookUser.UserName = cookEmail;
             cookUser.Email = cookEmail;
             cookUser.EmailConfirmed = true;
@@ -103,6 +104,31 @@ public class SeedController : ControllerBase
                 var newCookUser = _userManager.FindByNameAsync(cookEmail).Result;
                 var cookClaim = new Claim(ClaimTypes.Role, "Cook");
                 var claimAdded = _userManager.AddClaimAsync(newCookUser, cookClaim).Result;
+                var fullNameClaim = new Claim("FullName", cookUser.FullName);
+                _userManager.AddClaimAsync(newCookUser, fullNameClaim).Wait();
+            }
+            else
+            {
+                throw new Exception($"Error while creating user {cookEmail}");
+            }
+
+        }
+        if (_userManager.FindByNameAsync(cookEmail2).Result == null)
+        {
+            var cookUser = new ApiUser();
+            cookUser.FullName = "Jane Cook";
+            cookUser.UserName = cookEmail2;
+            cookUser.Email = cookEmail2;
+            cookUser.EmailConfirmed = true;
+
+            IdentityResult identityResult = _userManager.CreateAsync(cookUser, cookPassword2).Result;
+            if (identityResult.Succeeded)
+            {
+                var newCookUser = _userManager.FindByNameAsync(cookEmail2).Result;
+                var cookClaim = new Claim(ClaimTypes.Role, "Cook");
+                var claimAdded = _userManager.AddClaimAsync(newCookUser, cookClaim).Result;
+                var fullNameClaim = new Claim("FullName", cookUser.FullName);
+                _userManager.AddClaimAsync(newCookUser, fullNameClaim).Wait();
             }
             else
             {

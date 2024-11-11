@@ -17,17 +17,20 @@ public class AccountController : ControllerBase
     private readonly IConfiguration _configuration;
     private readonly UserManager<ApiUser> _userManager;
     private readonly SignInManager<ApiUser> _signInManager;
+    private readonly TokenService _tokenService;
     public AccountController(dbcontext context,
                             ILogger<AccountController> logger,
                             IConfiguration configuration,
                             UserManager<ApiUser> userManager,
-                            SignInManager<ApiUser> signInManager)
+                            SignInManager<ApiUser> signInManager,
+                            TokenService tokenService)
     {
         _context = context;
         _logger = logger;
         _configuration = configuration;
         _userManager = userManager;
         _signInManager = signInManager;
+        _tokenService = tokenService;
     }
 
     [HttpPost("Register")]
@@ -37,8 +40,18 @@ public class AccountController : ControllerBase
     }
 
     [HttpPost("Login")]
-    public async Task<ActionResult<LoginDTO>> Login(LoginDTO input)
+    public async Task<IActionResult> Login(LoginDTO loginDto)
     {
-        return await AccountService.Login(input,_context, _userManager, _logger, ModelState, _configuration);
+        var user = await _userManager.FindByNameAsync(loginDto.UserName);
+        if (user == null || !await _userManager.CheckPasswordAsync(user, loginDto.Password))
+        {
+            return Unauthorized("Invalid username or password.");
+        }
+
+        var userClaims = await _userManager.GetClaimsAsync(user);
+
+        var token = _tokenService.GenerateJwtToken(user, userClaims);
+
+        return Ok(new { token });
     }
 }

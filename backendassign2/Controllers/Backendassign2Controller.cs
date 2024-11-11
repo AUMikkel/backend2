@@ -8,8 +8,8 @@ using Serilog;
 namespace backendassign2.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
 [Authorize]
+[Route("api/[controller]")]
 public class MenuController : ControllerBase
 {
     private readonly dbcontext _context;
@@ -41,7 +41,9 @@ public class MenuController : ControllerBase
         _logger.LogInformation("Get called {@LogInfo} ", logInfo);
         return await CookService.GetCooks(name, _context);
     }
+    //no authorization for this endpoint
     
+    [AllowAnonymous]
     [HttpGet("GetDishesByCook/{cookId}")]
     public async Task<IEnumerable<ServiceDto.MealDto>> GetDishesByCook(int cookId)
     {
@@ -56,36 +58,8 @@ public class MenuController : ControllerBase
         _logger.LogInformation("Get called {@LogInfo} ", logInfo);
         return await CookService.GetDishesByCookAsync(cookId, _context);
     }
-    [HttpGet("GetOrderDetails")]
-     public async Task<IEnumerable<ServiceDto.OrderMealDto>> GetOrderDetails(int orderId)
-     {
-         var timestamp = new DateTimeOffset(DateTime.UtcNow);
-         var logInfo = new 
-         { 
-             Operation = "Get", 
-             Timestamp = timestamp,
-             User = GetUserName() 
-         };
-
-         _logger.LogInformation("Get called {@LogInfo} ", logInfo);
-         return await CookService.GetOrderDetailsAsync(orderId, _context);
-     }
-    [HttpGet("GetTripDetails")]
-    public async Task<IEnumerable<ServiceDto.TripDto>> GetTripDetails(int tripId)
-    {
-        var timestamp = new DateTimeOffset(DateTime.UtcNow);
-        var logInfo = new 
-        { 
-            Operation = "Get", 
-            Timestamp = timestamp,
-            User = GetUserName() 
-        };
-
-        _logger.LogInformation("Get called {@LogInfo} ", logInfo);
-        return await CookService.GetTripDetailsAsync(tripId, _context);
-    }
-    
-    [HttpGet("GetAverageRatingForCookAsync")]
+    [Authorize(Policy = "MatchFullNamePolicy")]
+    [HttpGet("GetAverageRatingForCookAsync/{cookId}")]
     public async Task<double?> GetAverageRatingForCookAsync(int cookId)
     {
         var timestamp = new DateTimeOffset(DateTime.UtcNow);
@@ -100,36 +74,19 @@ public class MenuController : ControllerBase
         return await CookService.GetAverageRatingForCookAsync(cookId, _context);
     }
     
-    [HttpGet("GetCyclistEarningsAsync")]
-    public async Task<dynamic> GetCyclistEarningsAsync(int cyclistID)
+    [Authorize(Policy = "MatchFullNamePolicy")]
+    [HttpGet("testcookget/{fullName}")]
+    public async Task<string> testcookget(string fullName)
     {
         var timestamp = new DateTimeOffset(DateTime.UtcNow);
         var logInfo = new 
         { 
-            Operation = "Get", 
+            Operation = "Post", 
             Timestamp = timestamp,
             User = GetUserName() 
         };
-
-        _logger.LogInformation("Get called {@LogInfo} ", logInfo);
-        return await CookService.GetCyclistEarningsAsync(cyclistID, _context);
+        return "Hello " + fullName;
     }
-    
-    [HttpGet("GetAverageRatingForCyclist")]
-    public async Task<dynamic> GetAverageRatingCyclist(int cyclistID)
-    {
-        var timestamp = new DateTimeOffset(DateTime.UtcNow);
-        var logInfo = new 
-        { 
-            Operation = "Get", 
-            Timestamp = timestamp,
-            User = GetUserName() 
-        };
-
-        _logger.LogInformation("Get called {@LogInfo} ", logInfo);
-        return await CookService.GetAverageRatingForDriversAsync(cyclistID, _context);
-    }
-    
     [HttpPost("AddMeal")]
     public async Task<ActionResult<ServiceDto.AddMealDto>> AddMeal(ServiceDto.AddMealDto meal)
     {
@@ -175,34 +132,10 @@ public class MenuController : ControllerBase
 
         _logger.LogInformation("Delete called {@LogInfo} ", logInfo);
         await CookService.DeleteMealAsync(mealId, _context);
-        return Ok();
+        return Ok(mealId);
     }
     
     
     
-    [HttpGet("SearchLogs")]
-    public async Task<IEnumerable<ServiceDto.LogDto>> SearchLogs(
-        DateTime startTime, 
-        DateTime endTime, 
-        string? user = null, 
-        string? operation = null)
-    {
-        var timestamp = new DateTimeOffset(DateTime.UtcNow);
-        var logInfo = new 
-        { 
-            Operation = "Get", 
-            Timestamp = timestamp,
-            User = GetUserName() 
-        };
     
-        // Ensure startTime and endTime are treated as UTC
-        var utcStartTime = DateTime.SpecifyKind(startTime, DateTimeKind.Utc);
-        var utcEndTime = DateTime.SpecifyKind(endTime, DateTimeKind.Utc);
-
-        _logger.LogInformation("Get called {@LogInfo} ", logInfo);
-
-        // Fetch logs with the specified criteria
-        var logs = await _mongoLogService.GetLogsAsync(utcStartTime, utcEndTime, user, operation);
-        return logs;
-    }
 }

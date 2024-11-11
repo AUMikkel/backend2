@@ -16,4 +16,6 @@ public class DeliveryDriver
     
     public BikeType BikeType { get; set; }
     public ICollection<Trip> Trip { get; set; }
+
+    public string UserId { get; set; }
 }

@@ -8,6 +8,7 @@ using backendassign2.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -98,6 +99,14 @@ builder.Services.AddAuthentication(options =>
                     builder.Configuration["JWT:SigningKey"]))
         };
     });
+
+// Add the authorization service
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("ManagerAccess", policy =>
+                    policy.RequireClaim(ClaimTypes.Role, "Manager"));
+
+});
 
 
 var app = builder.Build();

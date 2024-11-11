@@ -14,28 +14,31 @@ public class SeedController : ControllerBase
 {
     private readonly ILogger<AccountController> _logger;
     private readonly UserManager<ApiUser> _userManager;
+
+    private readonly dbcontext _context;
     public SeedController(dbcontext context,
                             ILogger<AccountController> logger,
                             UserManager<ApiUser> userManager)
     {
         _logger = logger;
         _userManager = userManager;
+        _context = context;
     }
 
     [HttpPut("Seed")]
     public async Task<ActionResult> Seed()
     {
-        const string adminEmail = "admin@localhost";
-        const string adminPassword = "Admin123!";
+        const string adminEmail = "admin@localhost.com";
+        const string adminPassword = "admin123!";
 
-        const string managerEmail = "manager@localhost";
-        const string managerPassword = "Manager123!";
+        const string managerEmail = "manager@localhost.com";
+        const string managerPassword = "manager123!";
 
-        const string cookEmail = "cook@localhost";
-        const string cookPassword = "Cook123!";
+        const string cookEmail = "cook@localhost.com";
+        const string cookPassword = "cook123!";
 
-        const string cyclistEmail = "cyclist@localhost";
-        const string cyclistPassword = "Cyclist123!";
+        const string cyclistEmail = "cyclist@localhost.com";
+        const string cyclistPassword = "cyclist123!";
 
 
         if (_userManager == null)
@@ -43,10 +46,11 @@ public class SeedController : ControllerBase
             _logger.LogError("UserManager is null");
             return StatusCode(500);
         }
+
         if (_userManager.FindByNameAsync(adminEmail).Result == null)
         {
             var adminUser = new ApiUser();
-            adminUser.FullName = "Admin";
+            adminUser.FullName = "AdminUser";
             adminUser.UserName = adminEmail;
             adminUser.Email = adminEmail;
             adminUser.EmailConfirmed = true;
@@ -69,7 +73,7 @@ public class SeedController : ControllerBase
         if (_userManager.FindByNameAsync(managerEmail).Result == null)
         {
             var managerUser = new ApiUser();
-            managerUser.FullName = "Manager";
+            managerUser.FullName = "ManagerUser";
             managerUser.UserName = managerEmail;
             managerUser.Email = managerEmail;
             managerUser.EmailConfirmed = true;
@@ -92,7 +96,7 @@ public class SeedController : ControllerBase
         if (_userManager.FindByNameAsync(cookEmail).Result == null)
         {
             var cookUser = new ApiUser();
-            cookUser.FullName = "Cook";
+            cookUser.FullName = "CookUser";
             cookUser.UserName = cookEmail;
             cookUser.Email = cookEmail;
             cookUser.EmailConfirmed = true;
@@ -115,7 +119,7 @@ public class SeedController : ControllerBase
         if (_userManager.FindByNameAsync(cyclistEmail).Result == null)
         {
             var cyclistUser = new ApiUser();
-            cyclistUser.FullName = "Cyclist";
+            cyclistUser.FullName = "CyclistUser";
             cyclistUser.UserName = cyclistEmail;
             cyclistUser.Email = cyclistEmail;
             cyclistUser.EmailConfirmed = true;
@@ -133,6 +137,20 @@ public class SeedController : ControllerBase
             }
 
         }
+        var cookUserId = _userManager.FindByNameAsync(cookEmail).Result.Id;
+        var cyclistUserId = _userManager.FindByNameAsync(cyclistEmail).Result.Id;
+
+        // For cook with id = 1 set UserId column to cookUserId
+        var cook = _context.Cooks.Find(1);
+        cook.UserId = cookUserId;
+        _context.Cooks.Update(cook);
+        _context.SaveChanges();
+
+        // For cyclist with id = 1 set UserId column to cyclistUserId
+        var cyclist = _context.DeliveryDrivers.Find(1);
+        cyclist.UserId = cyclistUserId;
+        _context.DeliveryDrivers.Update(cyclist);
+        _context.SaveChanges();
 
         return StatusCode(201);
     }

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Serilog;
 
+
 namespace backendassign2.Controllers;
 
 [ApiController]
@@ -26,7 +27,7 @@ public class MenuController : ControllerBase
         return User?.Identity?.IsAuthenticated == true ? User.Identity.Name : "Anonymous";
     }
    
-    
+    [Authorize("ManagerAccess")]
     [HttpGet("GetCooks")]
     public async Task<IEnumerable<ServiceDto.CookDto>> Get(string name)
     {
@@ -42,6 +43,7 @@ public class MenuController : ControllerBase
         return await CookService.GetCooks(name, _context);
     }
     
+    [AllowAnonymous]
     [HttpGet("GetDishesByCook/{cookId}")]
     public async Task<IEnumerable<ServiceDto.MealDto>> GetDishesByCook(int cookId)
     {
@@ -85,6 +87,7 @@ public class MenuController : ControllerBase
         return await CookService.GetTripDetailsAsync(tripId, _context);
     }
     
+    [Authorize(Policy = "CookOrAdminPolicy")]
     [HttpGet("GetAverageRatingForCookAsync")]
     public async Task<double?> GetAverageRatingForCookAsync(int cookId)
     {
@@ -100,6 +103,7 @@ public class MenuController : ControllerBase
         return await CookService.GetAverageRatingForCookAsync(cookId, _context);
     }
     
+    [Authorize(Policy = "CyclistOrAdminPolicy")]
     [HttpGet("GetCyclistEarningsAsync")]
     public async Task<dynamic> GetCyclistEarningsAsync(int cyclistID)
     {

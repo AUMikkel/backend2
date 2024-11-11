@@ -41,7 +41,7 @@ public class TripController : ControllerBase
     }
     
     
-    
+    [Authorize(Policy = "CyclistOrAdminPolicy")]
     [HttpGet("GetCyclistEarningsAsync/{cyclistId}")]
     public async Task<dynamic> GetCyclistEarningsAsync(int cyclistId)
     {

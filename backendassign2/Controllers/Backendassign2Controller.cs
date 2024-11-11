@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Serilog;
 
+
 namespace backendassign2.Controllers;
 
 [ApiController]
@@ -26,7 +27,7 @@ public class MenuController : ControllerBase
         return User?.Identity?.IsAuthenticated == true ? User.Identity.Name : "Anonymous";
     }
    
-    
+    [Authorize("ManagerAccess")]
     [HttpGet("GetCooks")]
     public async Task<IEnumerable<ServiceDto.CookDto>> Get(string name)
     {
@@ -41,7 +42,6 @@ public class MenuController : ControllerBase
         _logger.LogInformation("Get called {@LogInfo} ", logInfo);
         return await CookService.GetCooks(name, _context);
     }
-    //no authorization for this endpoint
     
     [AllowAnonymous]
     [HttpGet("GetDishesByCook/{cookId}")]
@@ -73,6 +73,7 @@ public class MenuController : ControllerBase
         _logger.LogInformation("Get called {@LogInfo} ", logInfo);
         return await CookService.GetAverageRatingForCookAsync(cookId, _context);
     }
+    
     
     [Authorize(Policy = "MatchFullNamePolicy")]
     [HttpGet("testcookget/{fullName}")]

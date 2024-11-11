@@ -29,4 +29,6 @@ public class Cook
     public string PhoneNo { get; set; }
     
     public bool HasPassedFoodSafetyCourse { get; set; } 
+
+    public string UserId { get; set; }
 }

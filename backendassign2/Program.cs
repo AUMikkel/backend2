@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using backendassign2;
 using backendassign2.Services;
 using backendassign2.Swashbuckle;
@@ -8,6 +9,7 @@ using backendassign2.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -135,6 +137,14 @@ builder.Services.AddAuthorization(options =>
             return false;
         }));
 });
+// Add the authorization service
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("ManagerAccess", policy =>
+                    policy.RequireClaim(ClaimTypes.Role, "Manager"));
+
+});
+
 
 var app = builder.Build();
 
@@ -144,7 +154,7 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     var context = services.GetRequiredService<dbcontext>();
     context.Database.EnsureCreated();
-    context.Seed();
+    //context.Seed();
 }
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

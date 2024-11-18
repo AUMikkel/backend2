@@ -43,7 +43,7 @@ public class TripController : ControllerBase
     
     [Authorize(Policy = "CyclistOrAdminPolicy")]
     [HttpGet("GetCyclistEarningsAsync/{cyclistId}")]
-    public async Task<dynamic> GetCyclistEarningsAsync(int cyclistId)
+    public async Task<dynamic> GetCyclistEarningsAsync(string cyclistId)
     {
         var timestamp = new DateTimeOffset(DateTime.UtcNow);
         var logInfo = new 
@@ -58,7 +58,7 @@ public class TripController : ControllerBase
     }
     
     [HttpGet("GetAverageRatingForCyclist/{cyclistId}")]
-    public async Task<dynamic> GetAverageRatingCyclist(int cyclistId)
+    public async Task<dynamic> GetAverageRatingCyclist(string cyclistId)
     {
         var timestamp = new DateTimeOffset(DateTime.UtcNow);
         var logInfo = new 

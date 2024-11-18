@@ -13,7 +13,7 @@ public class CustomerOrder
    
     public DateTime Timestamp { get; set; }
 
-    public Customer Customer { get; set; }
+    public ApiUser Customer { get; set; }
     
     public ICollection<Meal> Meal { get; set; }
     

@@ -101,42 +101,7 @@ builder.Services.AddAuthentication(options =>
                     builder.Configuration["JWT:SigningKey"]))
         };
     });
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("MatchFullNamePolicy", policy =>
-        policy.RequireAssertion(async context =>
-        {
-            var fullNameClaim = context.User.FindFirst("FullName");
-            if (fullNameClaim == null)
-            {
-                Console.WriteLine("FullName claim not found");
-                return false;
-            }
 
-            Console.WriteLine($"FullName claim: {fullNameClaim.Value}");
-
-            if (context.Resource is HttpContext httpContext &&
-                httpContext.Request.RouteValues.TryGetValue("cookId", out var routeCookId))
-            {
-                Console.WriteLine($"Route cookId: {routeCookId}");
-
-                if (int.TryParse(routeCookId.ToString(), out var cookId))
-                {
-                    // Get the cook's full name from the database
-                    var dbContext = httpContext.RequestServices.GetRequiredService<dbcontext>();
-                    var cook = await dbContext.Cooks.FindAsync(cookId);
-
-                    if (cook != null)
-                    {
-                        Console.WriteLine($"Database fullName: {cook.FullName}");
-                        return string.Equals(fullNameClaim.Value, cook.FullName, StringComparison.OrdinalIgnoreCase);
-                    }
-                }
-            }
-
-            return false;
-        }));
-});
 // Add the authorization service
 builder.Services.AddAuthorization(options =>
 {

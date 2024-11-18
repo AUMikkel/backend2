@@ -19,21 +19,25 @@ public static class CookService
     }
     public static async Task<List<ServiceDto.CookDto>> GetCooks(string name,dbcontext _context)
     {
-        return await _context.Cooks
+        return await _context.ApiUsers
             .Where(cook => cook.FullName.Equals(name))
             .Select(cook => new ServiceDto.CookDto()
             {
-                Address = cook.StreetName + " " + cook.HouseNumber + ", " + cook.Zipcode + ", " + cook.City,
+                Address = cook.Address,
                 PhoneNo = cook.PhoneNo,
-                CookId = cook.CookId,
-                HasPassedFoodSafetyCourse = cook.HasPassedFoodSafetyCourse
+                CookId = cook.Id
+            })
+            .Select(foodsafety => new ServiceDto.CookDto()
+            {
+                HasPassedFoodSafetyCourse = foodsafety.HasPassedFoodSafetyCourse
             })
             .ToListAsync();
     }
-    public static async Task<List<ServiceDto.MealDto>> GetDishesByCookAsync(int cookId, dbcontext _context)
+    
+    public static async Task<List<ServiceDto.MealDto>> GetDishesByCookAsync(string cookId, dbcontext _context)
     {
         return await _context.Meals
-            .Where(meal => meal.Cook.CookId == cookId)
+            .Where(meal => meal.Cook.Id == cookId)
             .Select(meal => new ServiceDto.MealDto()
             {
                 Dish = meal.Dish,
@@ -76,18 +80,32 @@ public static class CookService
             .ToListAsync();
     }
     
-    public static async Task<double?> GetAverageRatingForCookAsync(int cookId, dbcontext _context)
+    public static async Task<double?> GetAverageRatingForCookAsync(string cookUserId, dbcontext _context)
     {
-        return await _context.OrderMeals
-            .Where(orderMeal => orderMeal.Meal.Cook.CookId == cookId)
+        // Log the received CookId
+        Console.WriteLine($"Cook UserId received in service: {cookUserId}");
+
+        // Query to calculate the average rating
+        var averageRating = await _context.OrderMeals
+            .Where(orderMeal => orderMeal.Meal.Cook.Id == cookUserId) // Navigate the relationships
             .AverageAsync(orderMeal => (double?)orderMeal.Rating);
+        Console.WriteLine(_context.OrderMeals
+            .Select(ordermeal => ordermeal.Meal.Cook.Id));
+        // Handle no ratings case
+        if (averageRating == null)
+        {
+            Console.WriteLine("No ratings found for the cook.");
+            return 0.0; // Default value
+        }
+
+        return averageRating;
     }
     
-    public static async Task<List<dynamic>> GetCyclistEarningsAsync(int DeliveryDriverId, dbcontext _context)
+    public static async Task<List<dynamic>> GetCyclistEarningsAsync(string DeliveryDriverId, dbcontext _context)
     {
         // Calculate trip durations and hours worked
         var tripDurations = await _context.TripDetails
-            .Where(t1 => t1.Trip.DeliveryDriver.CyclistID == DeliveryDriverId)
+            .Where(t1 => t1.Trip.Driver.Id == DeliveryDriverId)
             .Join(
                 _context.TripDetails.Where(t2 => t2.Type == "delivery"),
                 t1 => t1.Trip.TripId,
@@ -95,7 +113,7 @@ public static class CookService
                 (t1, t2) => new
                 {
                     t1.Trip.TripId,
-                    t1.Trip.DeliveryDriver.CyclistID,
+                    t1.Trip.Driver.Id,
                     PickupTime = t1.TripDate,
                     DeliveryTime = t2.TripDate,
                     TripDate = t1.TripDate,
@@ -107,7 +125,7 @@ public static class CookService
 
         // Group by cyclist and month, then calculate total hours and earnings
         var earnings = tripDurations
-            .GroupBy(td => new { td.CyclistID, td.Month })
+            .GroupBy(td => new { td.Id, td.Month })
             .Select(g => new
             {
                 Month = DateTimeFormatInfo.CurrentInfo.GetMonthName(g.Key.Month),
@@ -121,10 +139,10 @@ public static class CookService
     }
    
    
-    public static async Task<double> GetAverageRatingForDriversAsync(int driverid, dbcontext _context)
+    public static async Task<double> GetAverageRatingForDriversAsync(string driverid, dbcontext _context)
     {
         return await _context.Trip
-            .Where(Trip => Trip.DeliveryDriver.CyclistID == driverid)
+            .Where(Trip => Trip.Driver.Id == driverid)
             .AverageAsync(Trip => (double)Trip.rating);
     }
     
@@ -141,8 +159,8 @@ public static class CookService
      */
     public static async Task AddMealAsync(ServiceDto.AddMealDto AddmealDto, dbcontext _context)
     {
-        var cook = await _context.Cooks
-            .Where(cook => cook.CookId == AddmealDto.CookId)
+        var cook = await _context.ApiUsers
+            .Where(cook => cook.Id == AddmealDto.CookId)
             .FirstOrDefaultAsync();
         if (cook == null)
         {
@@ -160,7 +178,6 @@ public static class CookService
         _context.Meals.Add(meal);
         await _context.SaveChangesAsync();
     }
-    
     
     public static async Task UpdateQuantityAsync(ServiceDto.UpdateQuantityDto updateQuantityDto, dbcontext _context)
     {
@@ -213,7 +230,6 @@ public static class CookService
         return logs;
     }
     
-
 
 
 }

@@ -1,6 +1,8 @@
+using System.Security.Claims;
 using backendassign2.Entities;
 using backendassign2.DTOs;
 using backendassign2.Services;
+using Microsoft.AspNet.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Serilog;
@@ -45,7 +47,7 @@ public class MenuController : ControllerBase
     
     [AllowAnonymous]
     [HttpGet("GetDishesByCook/{cookId}")]
-    public async Task<IEnumerable<ServiceDto.MealDto>> GetDishesByCook(int cookId)
+    public async Task<IEnumerable<ServiceDto.MealDto>> GetDishesByCook(string cookId)
     {
         var timestamp = new DateTimeOffset(DateTime.UtcNow);
         var logInfo = new 
@@ -58,20 +60,29 @@ public class MenuController : ControllerBase
         _logger.LogInformation("Get called {@LogInfo} ", logInfo);
         return await CookService.GetDishesByCookAsync(cookId, _context);
     }
-    [Authorize(Policy = "MatchFullNamePolicy")]
-    [HttpGet("GetAverageRatingForCookAsync/{cookId}")]
-    public async Task<double?> GetAverageRatingForCookAsync(int cookId)
+    [Authorize(Roles = "Cook")]
+    [HttpGet("GetAverageRatingForCookAsync/")]
+    public async Task<double?> GetAverageRatingForCookAsync()
     {
-        var timestamp = new DateTimeOffset(DateTime.UtcNow);
-        var logInfo = new 
-        { 
-            Operation = "Get", 
-            Timestamp = timestamp,
-            User = GetUserName() 
-        };
+        // Extract NameIdentifier from claims
+        string nameIdentifier = User.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
 
-        _logger.LogInformation("Get called {@LogInfo} ", logInfo);
-        return await CookService.GetAverageRatingForCookAsync(cookId, _context);
+        // Log extracted NameIdentifier for debugging
+        if (string.IsNullOrEmpty(nameIdentifier))
+        {
+            _logger.LogError("NameIdentifier is null or empty. Ensure the claim exists and is configured correctly.");
+            return null; // Or handle the error as appropriate
+        }
+
+        Console.WriteLine($"Extracted NameIdentifier: {nameIdentifier}");
+
+        // Pass the NameIdentifier to the service method
+        var averageRating = await CookService.GetAverageRatingForCookAsync(nameIdentifier, _context);
+
+        // Log the result
+        Console.WriteLine($"Average Rating for Cook {nameIdentifier}: {averageRating}");
+
+        return averageRating;
     }
     
     

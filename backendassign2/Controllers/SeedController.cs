@@ -5,6 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using MongoDB.Bson.Serialization;
+using Exception = System.Exception;
 
 namespace backendassign2.Controllers;
 
@@ -15,6 +19,13 @@ public class SeedController : ControllerBase
     private readonly ILogger<AccountController> _logger;
     private readonly UserManager<ApiUser> _userManager;
     private readonly dbcontext _context;
+    public DbSet<CustomerOrder> CustomerOrders { get; set; }
+    public DbSet<TripDetails> TripDetails { get; set; }
+    public DbSet<Cook> Cooks { get; set; }
+    public DbSet<Meal> Meals { get; set; }
+    public DbSet<OrderMeal> OrderMeals { get; set; }
+    public DbSet<Trip> Trip { get; set; }
+    public DbSet<ApiUser> ApiUsers { get; set; }
     public SeedController(dbcontext context,
                             ILogger<AccountController> logger,
                             UserManager<ApiUser> userManager)
@@ -25,8 +36,10 @@ public class SeedController : ControllerBase
     }
 
     [HttpPut("Seed")]
+    
     public async Task<ActionResult> Seed()
     {
+        Console.WriteLine("Seeding data");
         const string adminEmail = "admin@localhost.com";
         const string adminPassword = "admin123!";
 
@@ -41,6 +54,373 @@ public class SeedController : ControllerBase
 
         const string cyclistEmail = "cyclist@localhost.com";
         const string cyclistPassword = "cyclist123!";
+        
+        const string cyclistEmail2 = "cyclist2@localhost.com";
+        const string cyclistPassword2 = "cyclist123!";
+        
+        const string customeremail1 = "cust@localhost.com";
+        const string customerpass1 = "cust123!";
+        
+        const string customeremail2 = "cust2@localhost.com";
+        const string customerpass2 = "cust123!";
+        
+         ApiUser customer1 = new ApiUser()
+        {
+            FullName = "John Doe",
+            PhoneNo = "12345678",
+            Address = "Main Street 1, 1234 City",
+            Email = customeremail1,
+            UserName = customeremail1,
+            EmailConfirmed = true
+        };
+       
+        ApiUser customer2 = new ApiUser()
+        {
+            FullName = "Jane Doe", 
+            PhoneNo = "87654321",
+            UserName = customeremail2,
+            Email = customeremail2,
+            Address = "Third Street 3, 4323 City",
+            EmailConfirmed = true
+        };
+        //ApiUsers.AddRange(customer1, customer2);
+        if (_userManager.FindByNameAsync(customeremail1).Result == null)
+        {
+            var cookUser = customer1;
+
+            IdentityResult identityResult = _userManager.CreateAsync(cookUser, customerpass2).Result;
+            if (identityResult.Errors.Any())
+            {
+                var errors = string.Join(", ", identityResult.Errors.Select(e => e.Description));
+                throw new Exception($"Error while creating user1 {customeremail1}: {errors}");
+            }
+        }
+        if (_userManager.FindByNameAsync(customeremail2).Result == null)
+        {
+            var cookUser = customer2;
+
+            IdentityResult identityResult = _userManager.CreateAsync(cookUser, customerpass2).Result;
+            if (identityResult.Errors.Any())
+            {
+                var errors = string.Join(", ", identityResult.Errors.Select(e => e.Description));
+                throw new Exception($"Error while creating user2 {customeremail1}: {errors}");
+            }
+        }
+        
+        
+        Console.WriteLine("førcooks");
+        ApiUser cook1 = new ApiUser()
+        {
+            FullName = "Jane Cook",
+            PhoneNo = "87654321",
+            Address = "Second Street 2, 4321 City",
+            UserName = cookEmail,
+            Email = cookEmail,
+            EmailConfirmed = true
+        };
+        
+        ApiUser cook2 = new ApiUser()
+        {
+            FullName = "John Cook",
+            PhoneNo = "12345678",
+            Address = "Main Street 1, 1234 City",
+            UserName = cookEmail2,
+            Email = cookEmail2,
+            EmailConfirmed = true
+        };
+        if (_userManager.FindByNameAsync(cookEmail).Result == null)
+        {
+            var cookUser = cook1;
+
+            IdentityResult identityResult = _userManager.CreateAsync(cookUser, cookPassword).Result;
+            if (identityResult.Succeeded)
+            {
+                var newCookUser = _userManager.FindByNameAsync(cookEmail).Result;
+                var cookClaim = new Claim(ClaimTypes.Role, "Cook");
+                var claimAdded = _userManager.AddClaimAsync(newCookUser, cookClaim).Result;
+                var userclaim = new Claim(ClaimTypes.NameIdentifier, newCookUser.Id);
+                _userManager.AddClaimAsync(newCookUser, userclaim);
+            }
+            else
+            {
+                var errors = string.Join(", ", identityResult.Errors.Select(e => e.Description));
+                throw new Exception($"Error while creating cook1 {cookEmail}: {errors}");
+            }
+        }
+        if (_userManager.FindByNameAsync(cookEmail2).Result == null)
+        {
+            var cookUser = cook2;
+
+            IdentityResult identityResult = _userManager.CreateAsync(cookUser, cookPassword2).Result;
+            if (identityResult.Succeeded)
+            {
+                var newCookUser = _userManager.FindByNameAsync(cookEmail2).Result;
+                var cookClaim = new Claim(ClaimTypes.Role, "Cook");
+                var userclaim = new Claim(ClaimTypes.NameIdentifier, newCookUser.Id);
+                var claimAdded = _userManager.AddClaimAsync(newCookUser, cookClaim).Result;
+                _userManager.AddClaimAsync(newCookUser, userclaim);
+            }
+            else
+            {
+                var errors = string.Join(", ", identityResult.Errors.Select(e => e.Description));
+                throw new Exception($"Error while creating cook2 {cookEmail}: {errors}");
+            }
+        }
+        
+        var existingCook1 = await _userManager.FindByNameAsync(cookEmail);
+        if (existingCook1 == null)
+        {
+            throw new Exception($"Cook {cookEmail} not found. Ensure it was created successfully.");
+        }
+        Meal meal1 = new Meal
+        {
+            Cook = cook1,
+            CookId = cook1.Id,
+            Dish = "Pizza",
+            Quantity = 1,
+            Price = 100,
+            StartTime = new DateTime(2024,08,12, 12,0,0),
+            EndTime = new DateTime(2024,08,12, 18,0,0)
+            
+        };
+        
+        Meal meal2 = new Meal
+        {
+            Cook = cook2,
+            CookId = cook2.Id,
+            Dish = "Pasta",
+            Quantity = 2,
+            Price = 200,
+            StartTime = new DateTime(2024,08,12, 12,0,0),
+            EndTime = new DateTime(2024,08,12, 18,0,0)
+        };
+        Meal meal3 = new Meal
+        {
+            Cook = cook2,
+            CookId = cook2.Id,
+            Dish = "Panini",
+            Quantity = 6,
+            Price = 150,
+            StartTime = new DateTime(2024,08,12, 12,0,0),
+            EndTime = new DateTime(2024,08,12, 18,0,0)
+        };
+        
+        Console.WriteLine("eftermeals");
+        
+        ApiUser driver1 = new ApiUser()
+        {
+            FullName = "John Driver",
+            PhoneNo = "12345678",
+            UserName = cyclistEmail,
+            Email = cyclistEmail,
+            EmailConfirmed = true,
+            Address = "Second Street 2, 4321 City"
+        };
+        ApiUser driver2 = new ApiUser()
+        {
+            FullName = "Jane Driver",
+            PhoneNo = "87654321",
+            UserName = cyclistEmail2,
+            Email = cyclistEmail2,
+            EmailConfirmed = true,
+            Address = "Third Street 3, 4323 City"
+        };
+        
+        //ApiUsers.AddRange(driver1, driver2);
+        if (_userManager.FindByNameAsync(cyclistEmail).Result == null)
+        {
+            var cyclistUser = driver1;
+
+            IdentityResult identityResult = _userManager.CreateAsync(cyclistUser, cyclistPassword).Result;
+            if (identityResult.Succeeded)
+            {
+                var newCyclistUser = _userManager.FindByNameAsync(cyclistEmail).Result;
+                var cyclistClaim = new Claim(ClaimTypes.Role, "Cyclist");
+                var claimAdded = _userManager.AddClaimAsync(newCyclistUser, cyclistClaim).Result;
+            }
+            else
+            {
+                throw new Exception($"Error while creating user {cyclistEmail}");
+            }
+
+        }
+        if (_userManager.FindByNameAsync(cyclistEmail2).Result == null)
+        {
+            var cyclistUser = driver2;
+
+            IdentityResult identityResult = _userManager.CreateAsync(cyclistUser, cyclistPassword2).Result;
+            if (identityResult.Succeeded)
+            {
+                var newCyclistUser = _userManager.FindByNameAsync(cyclistEmail2).Result;
+                var cyclistClaim = new Claim(ClaimTypes.Role, "Cyclist");
+                var claimAdded = _userManager.AddClaimAsync(newCyclistUser, cyclistClaim).Result;
+            }
+            else
+            {
+                throw new Exception($"Error while creating user {cyclistEmail2}");
+            }
+
+        }
+        
+        CustomerOrder order1 = new CustomerOrder
+        {
+            Customer = customer1,
+            Timestamp = new DateTime(2024,08,12, 12,0,0),
+            Price = 100,
+        };
+        CustomerOrder order2 = new CustomerOrder
+        {
+            Customer = customer2,
+            Timestamp = new DateTime(2024,08,12, 14,0,0),
+            Price = 200
+        };
+        
+        CustomerOrder order3 = new CustomerOrder
+        {
+            Customer = customer2,
+            Timestamp = new DateTime(2024,08,12, 15,0,0),
+            Price = 275
+        };
+        CustomerOrder order4 = new CustomerOrder
+        {
+            Customer = customer2,
+            Timestamp = new DateTime(2024,08,12, 16,0,0),
+            Price = 220
+        };
+        
+        CustomerOrder order5 = new CustomerOrder
+        {
+            Customer = customer1,
+            Timestamp = new DateTime(2024,08,12, 17,0,0),
+            Price = 225
+        };
+        
+        
+        OrderMeal orderMeal1 = new OrderMeal
+        {
+            CustomerOrder = order1,
+            Meal = meal1,
+            Quantity = 1,
+            Rating = 4
+        };
+        OrderMeal orderMeal2 = new OrderMeal
+        {
+            CustomerOrder = order2,
+            Meal = meal2,
+            Quantity = 2,
+            Rating = 5
+        };
+        
+        OrderMeal orderMeal3 = new OrderMeal
+        {
+            CustomerOrder = order3,
+            Meal = meal3,
+            Quantity = 1,
+            Rating = 2
+        };
+        
+        OrderMeal orderMeal4 = new OrderMeal
+        {
+            CustomerOrder = order4,
+            Meal = meal3,
+            Quantity = 1,
+            Rating = 2
+        };
+        
+        OrderMeal orderMeal5 = new OrderMeal
+        {
+            CustomerOrder = order5,
+            Meal = meal3,
+            Quantity = 1,
+            Rating = 2
+        };
+        
+        
+
+        Trip trip1 = new Trip
+        {
+            Driver = driver1,
+            rating = 5
+        };
+        
+        Trip trip2 = new Trip
+        {
+            Driver = driver1,
+            rating = 4
+        };
+        
+        
+        Trip trip3 = new Trip
+        {
+            Driver = driver1,
+            rating = 2
+        };
+        
+        TripDetails tripdetails1 = new TripDetails
+        {
+            Address = cook1.Address,
+            TripDate = new DateTime(2024,08,12, 12,0,0),
+            Type = "Pickup",
+            Trip = trip1
+        };
+        TripDetails tripdetails2 = new TripDetails
+        {
+            Address = customer1.Address,
+            TripDate = new DateTime(2024,08,12, 13,0,0),
+            Type = "Delivery",
+            Trip = trip1
+        };
+        
+        TripDetails tripdetails3= new TripDetails
+        {
+            Address = cook2.Address,
+            TripDate = new DateTime(2024,09,12, 13,0,0),
+            Type = "Pickup",
+            Trip = trip2
+        };
+        
+        TripDetails tripdetails4 = new TripDetails
+        {
+            Address = customer2.Address,
+            TripDate = new DateTime(2024,09,12, 13,45,0),
+            Type = "Delivery",
+            Trip = trip2
+        };
+        
+        TripDetails tripdetails5 = new TripDetails
+        {
+            Address = cook2.Address,
+            TripDate = new DateTime(2024,08,12, 15,0,0),
+            Type = "Pickup",
+            Trip = trip3
+        };
+        
+        TripDetails tripdetails6 = new TripDetails
+        {
+            Address = customer2.Address,
+            TripDate = new DateTime(2024,08,12, 16,0,0),
+            Type = "Delivery",
+            Trip = trip3
+        };
+        Console.WriteLine("eftertripdetails");
+        _context.Meals.AddRange(meal1, meal2, meal3);
+        Console.WriteLine("eftermeals2");
+        _context.CustomerOrders.AddRange(order1, order2, order3, order4, order5);
+        Console.WriteLine("efterorders");
+        _context.OrderMeals.AddRange(orderMeal1, orderMeal2, orderMeal3, orderMeal4, orderMeal5);
+        _context.Trip.AddRange(trip1,trip2,trip3);
+        order1.Trip = trip1;
+        order2.Trip = trip1;
+        order3.Trip = trip2;
+        order4.Trip = trip3;
+        order5.Trip = trip3;
+        
+        _context.TripDetails.AddRange(tripdetails1, tripdetails2, tripdetails3, tripdetails4, tripdetails5, tripdetails6);
+        Console.WriteLine("eftertrip");
+        
+        _context.SaveChanges();
+    
+        
 
 
         if (_userManager == null)
@@ -55,6 +435,8 @@ public class SeedController : ControllerBase
             adminUser.FullName = "AdminUser";
             adminUser.UserName = adminEmail;
             adminUser.Email = adminEmail;
+            adminUser.Address = "First Street 1, 1234 City";
+            adminUser.PhoneNo = "12345678";
             adminUser.EmailConfirmed = true;
 
             IdentityResult identityResult = _userManager.CreateAsync(adminUser, adminPassword).Result;
@@ -62,7 +444,14 @@ public class SeedController : ControllerBase
             {
                 var newAdminUser = _userManager.FindByNameAsync(adminEmail).Result;
                 var adminClaim = new Claim(ClaimTypes.Role, "Admin");
-                var claimAdded = _userManager.AddClaimAsync(newAdminUser, adminClaim).Result;
+                var driverclaim = new Claim(ClaimTypes.Role, "Cyclist");
+                var cookclaim = new Claim(ClaimTypes.Role, "Cook");
+                var managerclaim = new Claim(ClaimTypes.Role, "Manager");
+                await _userManager.AddClaimAsync(newAdminUser, driverclaim);
+                await _userManager.AddClaimAsync(newAdminUser, cookclaim);
+                await _userManager.AddClaimAsync(newAdminUser, managerclaim);
+                await _userManager.AddClaimAsync(newAdminUser, adminClaim);
+                
             }
             else
             {
@@ -78,6 +467,8 @@ public class SeedController : ControllerBase
             managerUser.FullName = "ManagerUser";
             managerUser.UserName = managerEmail;
             managerUser.Email = managerEmail;
+            managerUser.Address = "Second Street 2, 4321 City";
+            managerUser.PhoneNo = "87654321";
             managerUser.EmailConfirmed = true;
 
             IdentityResult identityResult = _userManager.CreateAsync(managerUser, managerPassword).Result;
@@ -85,7 +476,7 @@ public class SeedController : ControllerBase
             {
                 var newManagerUser = _userManager.FindByNameAsync(managerEmail).Result;
                 var managerClaim = new Claim(ClaimTypes.Role, "Manager");
-                var claimAdded = _userManager.AddClaimAsync(newManagerUser, managerClaim).Result;
+                await _userManager.AddClaimAsync(managerUser, managerClaim);
             }
             else
             {
@@ -94,91 +485,11 @@ public class SeedController : ControllerBase
 
         }
 
-        // For cook
-        if (_userManager.FindByNameAsync(cookEmail).Result == null)
-        {
-            var cookUser = new ApiUser();
-            cookUser.FullName = "CookUser";
-            cookUser.UserName = cookEmail;
-            cookUser.Email = cookEmail;
-            cookUser.EmailConfirmed = true;
-
-            IdentityResult identityResult = _userManager.CreateAsync(cookUser, cookPassword).Result;
-            if (identityResult.Succeeded)
-            {
-                var newCookUser = _userManager.FindByNameAsync(cookEmail).Result;
-                var cookClaim = new Claim(ClaimTypes.Role, "Cook");
-                var claimAdded = _userManager.AddClaimAsync(newCookUser, cookClaim).Result;
-                var fullNameClaim = new Claim("FullName", cookUser.FullName);
-                _userManager.AddClaimAsync(newCookUser, fullNameClaim).Wait();
-            }
-            else
-            {
-                throw new Exception($"Error while creating user {cookEmail}");
-            }
-
-        }
-        if (_userManager.FindByNameAsync(cookEmail2).Result == null)
-        {
-            var cookUser = new ApiUser();
-            cookUser.FullName = "Jane Cook";
-            cookUser.UserName = cookEmail2;
-            cookUser.Email = cookEmail2;
-            cookUser.EmailConfirmed = true;
-
-            IdentityResult identityResult = _userManager.CreateAsync(cookUser, cookPassword2).Result;
-            if (identityResult.Succeeded)
-            {
-                var newCookUser = _userManager.FindByNameAsync(cookEmail2).Result;
-                var cookClaim = new Claim(ClaimTypes.Role, "Cook");
-                var claimAdded = _userManager.AddClaimAsync(newCookUser, cookClaim).Result;
-                var fullNameClaim = new Claim("FullName", cookUser.FullName);
-                _userManager.AddClaimAsync(newCookUser, fullNameClaim).Wait();
-            }
-            else
-            {
-                throw new Exception($"Error while creating user {cookEmail}");
-            }
-
-        }
-
-        // For cyclist
-        if (_userManager.FindByNameAsync(cyclistEmail).Result == null)
-        {
-            var cyclistUser = new ApiUser();
-            cyclistUser.FullName = "CyclistUser";
-            cyclistUser.UserName = cyclistEmail;
-            cyclistUser.Email = cyclistEmail;
-            cyclistUser.EmailConfirmed = true;
-
-            IdentityResult identityResult = _userManager.CreateAsync(cyclistUser, cyclistPassword).Result;
-            if (identityResult.Succeeded)
-            {
-                var newCyclistUser = _userManager.FindByNameAsync(cyclistEmail).Result;
-                var cyclistClaim = new Claim(ClaimTypes.Role, "Cyclist");
-                var claimAdded = _userManager.AddClaimAsync(newCyclistUser, cyclistClaim).Result;
-            }
-            else
-            {
-                throw new Exception($"Error while creating user {cyclistEmail}");
-            }
-
-        }
-        var cookUserId = _userManager.FindByNameAsync(cookEmail).Result.Id;
-        var cyclistUserId = _userManager.FindByNameAsync(cyclistEmail).Result.Id;
-
-        // For cook with id = 1 set UserId column to cookUserId
-        var cook = _context.Cooks.Find(1);
-        cook.UserId = cookUserId;
-        _context.Cooks.Update(cook);
-        _context.SaveChanges();
-
-        // For cyclist with id = 1 set UserId column to cyclistUserId
-        var cyclist = _context.DeliveryDrivers.Find(1);
-        cyclist.UserId = cyclistUserId;
-        _context.DeliveryDrivers.Update(cyclist);
-        _context.SaveChanges();
-
+        
+        
+       
+       
+       
         return StatusCode(201);
     }
 }

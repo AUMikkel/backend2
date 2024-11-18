@@ -10,15 +10,11 @@ public class dbcontext : IdentityDbContext<ApiUser>
     {
     }
     
-    public DbSet<DeliveryDriver> DeliveryDrivers { get; set; }
-    public DbSet<Customer> Customers { get; set; }
     public DbSet<CustomerOrder> CustomerOrders { get; set; }
     public DbSet<TripDetails> TripDetails { get; set; }
     public DbSet<Cook> Cooks { get; set; }
     public DbSet<Meal> Meals { get; set; }
     public DbSet<OrderMeal> OrderMeals { get; set; }
-    public DbSet<PaymentOption> PaymentOptions { get; set; }
-    public DbSet<BikeType> BikeType { get; set; }
     public DbSet<Trip> Trip { get; set; }
     public DbSet<ApiUser> ApiUsers { get; set; }
     
@@ -36,81 +32,52 @@ public class dbcontext : IdentityDbContext<ApiUser>
         modelBuilder.Entity<OrderMeal>()
             .HasOne(m => m.Meal)
             .WithMany(b => b.OrderMeal);
-        
+        modelBuilder.Entity<Meal>()
+            .HasOne(m => m.Cook)       // Each Meal has one Cook
+            .WithMany(u => u.Meals)   // Each ApiUser (Cook) can have many Meals
+            .HasForeignKey(m => m.CookId)  // Foreign key in Meal
+            .OnDelete(DeleteBehavior.NoAction);
+        modelBuilder.Entity<CustomerOrder>()
+            .HasOne(co => co.Customer)
+            .WithMany(u => u.CustomerOrder)
+            .OnDelete(DeleteBehavior.NoAction);
         
         base.OnModelCreating(modelBuilder);
     }
     
     // Seed data
+    /*
     public void Seed()
     {
         
-        PaymentOption cash = new PaymentOption { Option ="Cash" };
-        PaymentOption creditCard = new PaymentOption { Option = "Credit Card" };
-        PaymentOption mobilePay = new PaymentOption { Option = "MobilePay" };
-        
-        BikeType mountainBike = new BikeType { Bike = "mountainBike" };
-        BikeType roadBike = new BikeType { Bike = "roadBike" };
-        BikeType cityBike = new BikeType { Bike = "cityBike" };
-        BikeType electricBike = new BikeType { Bike = "electricBike" };
-        
-        BikeType.AddRange(mountainBike, roadBike, cityBike, electricBike);
-        PaymentOptions.AddRange(cash, creditCard, mobilePay);
-        
-        Customer customer1 = new Customer
+        ApiUser customer1 = new ApiUser()
         {
             FullName = "John Doe",
-            PhoneNo = "12345678",
-            StreetName = "Main Street",
-            Zipcode = 1234,
-            HouseNumber = 1,
-            City = "City",
-            PaymentOption = cash
+            phoneNo = "12345678",
+            Address = "Main Street 1, 1234 City"
         };
        
-        Customer customer2 = new Customer
+        ApiUser customer2 = new ApiUser()
         {
-            FullName = "Jane Doe",
-            PhoneNo = "87654321",
-            StreetName = "Third Street",
-            Zipcode = 4323,
-            HouseNumber = 3,
-            City = "City",
-            PaymentOption = creditCard
+            FullName = "Jane Doe", 
+            phoneNo = "87654321",
+            Address = "Third Street 3, 4323 City"
         };
-       
-        Customer customer3 = new Customer
-        {
-            FullName = "Alice Doe",
-            PhoneNo = "12348765",
-            StreetName = "Third Street",
-            Zipcode = 5678,
-            HouseNumber = 3,
-            City = "City",
-            PaymentOption = mobilePay
-        };
-       
-        Customers.AddRange(customer1, customer2, customer3);
+        ApiUsers.AddRange(customer1, customer2);
         
-        Cook cook1 = new Cook
+        ApiUser cook1 = new ApiUser()
         {
             FullName = "John Cook",
-            PhoneNo = "12345678",
-            StreetName = "Main Street",
-            Zipcode = 1234,
-            HouseNumber = 1,
-            City = "City"
+            phoneNo = "12345678",
+            Address = "Main Street 1, 1234 City"
         };
-        Cook cook2 = new Cook
+        ApiUser cook2 = new ApiUser()
         {
             FullName = "Jane Cook",
-            PhoneNo = "87654321",
-            StreetName = "Second Street",
-            Zipcode = 4321,
-            HouseNumber = 2,
-            City = "City"
+            phoneNo = "87654321",
+            Address = "Second Street 2, 4321 City"
         };
-        Cooks.AddRange(cook1, cook2);
+        ApiUsers.AddRange(cook1, cook2);
         
         Meal meal1 = new Meal
         {
@@ -143,19 +110,17 @@ public class dbcontext : IdentityDbContext<ApiUser>
         };
         
         
-        DeliveryDriver driver1 = new DeliveryDriver
+        ApiUser driver1 = new ApiUser()
         {
             FullName = "John Driver",
-            PhoneNo = "12345678",
-            BikeType = mountainBike
+            phoneNo = "12345678"
         };
-        DeliveryDriver driver2 = new DeliveryDriver
+        ApiUser driver2 = new ApiUser()
         {
             FullName = "Jane Driver",
-            PhoneNo = "87654321",
-            BikeType = roadBike
+            phoneNo = "87654321",
         };
-        DeliveryDrivers.AddRange(driver1, driver2);
+        ApiUsers.AddRange(driver1, driver2);
         
         CustomerOrder order1 = new CustomerOrder
         {
@@ -234,33 +199,33 @@ public class dbcontext : IdentityDbContext<ApiUser>
 
         Trip trip1 = new Trip
         {
-            DeliveryDriver = driver1,
+            Driver = driver1,
             rating = 5
         };
         
         Trip trip2 = new Trip
         {
-            DeliveryDriver = driver1,
+            Driver = driver1,
             rating = 4
         };
         
         
         Trip trip3 = new Trip
         {
-            DeliveryDriver = driver1,
+            Driver = driver1,
             rating = 2
         };
         
         TripDetails tripdetails1 = new TripDetails
         {
-            Address = cook1.StreetName + " " + cook1.HouseNumber + ", " + cook1.Zipcode + " " + cook1.City,
+            Address = cook1.Address,
             TripDate = new DateTime(2024,08,12, 12,0,0),
             Type = "Pickup",
             Trip = trip1
         };
         TripDetails tripdetails2 = new TripDetails
         {
-            Address = customer2.StreetName + " " + customer2.HouseNumber + ", " + customer2.Zipcode + " " + customer2.City,
+            Address = customer1.Address,
             TripDate = new DateTime(2024,08,12, 13,0,0),
             Type = "Delivery",
             Trip = trip1
@@ -268,7 +233,7 @@ public class dbcontext : IdentityDbContext<ApiUser>
         
         TripDetails tripdetails3= new TripDetails
         {
-            Address = cook2.StreetName + " " + cook2.HouseNumber + ", " + cook2.Zipcode + " " + cook2.City,
+            Address = cook2.Address,
             TripDate = new DateTime(2024,09,12, 13,0,0),
             Type = "Pickup",
             Trip = trip2
@@ -276,7 +241,7 @@ public class dbcontext : IdentityDbContext<ApiUser>
         
         TripDetails tripdetails4 = new TripDetails
         {
-            Address = customer2.StreetName + " " + customer2.HouseNumber + ", " + customer2.Zipcode + " " + customer2.City,
+            Address = customer2.Address,
             TripDate = new DateTime(2024,09,12, 13,45,0),
             Type = "Delivery",
             Trip = trip2
@@ -284,7 +249,7 @@ public class dbcontext : IdentityDbContext<ApiUser>
         
         TripDetails tripdetails5 = new TripDetails
         {
-            Address = cook2.StreetName + " " + cook2.HouseNumber + ", " + cook2.Zipcode + " " + cook2.City,
+            Address = cook2.Address,
             TripDate = new DateTime(2024,08,12, 15,0,0),
             Type = "Pickup",
             Trip = trip3
@@ -292,7 +257,7 @@ public class dbcontext : IdentityDbContext<ApiUser>
         
         TripDetails tripdetails6 = new TripDetails
         {
-            Address = customer2.StreetName + " " + customer2.HouseNumber + ", " + customer2.Zipcode + " " + customer2.City,
+            Address = customer2.Address,
             TripDate = new DateTime(2024,08,12, 16,0,0),
             Type = "Delivery",
             Trip = trip3
@@ -315,5 +280,6 @@ public class dbcontext : IdentityDbContext<ApiUser>
         
         
     }
+    */
     
 }

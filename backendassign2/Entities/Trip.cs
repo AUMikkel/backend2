@@ -10,5 +10,6 @@ public class Trip
     
     public ICollection<CustomerOrder> CustomerOrder { get; set; }
     public ICollection<TripDetails> TripDetails { get; set; }
-    public DeliveryDriver DeliveryDriver { get; set; }
+    
+    public ApiUser Driver { get; set; }
 }

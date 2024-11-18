@@ -11,7 +11,7 @@ public class ServiceDto
     {
         public string Address { get; set; }
         public string PhoneNo { get; set; }
-        public int CookId { get; set; }
+        public string CookId { get; set; }
         public bool HasPassedFoodSafetyCourse { get; set; }
     }
 
@@ -34,7 +34,7 @@ public class ServiceDto
         [PriceValidation]
         public decimal Price { get; set; }
         public int Quantity { get; set; }
-        public int CookId { get; set; }
+        public string CookId { get; set; }
         
     }
 

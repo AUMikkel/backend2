@@ -1,11 +1,12 @@
 using backendassign2.DTOs;
 using backendassign2.Services;
+using Microsoft.AspNet.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 
 namespace backendassign2.Controllers;
 [ApiController]
-[Authorize]
+[Authorize(Roles = "Cyclist")]
 [Route("api/[controller]")]
 public class TripController : ControllerBase
 {
@@ -41,10 +42,21 @@ public class TripController : ControllerBase
     }
     
     
-    [Authorize(Policy = "CyclistOrAdminPolicy")]
-    [HttpGet("GetCyclistEarningsAsync/{cyclistId}")]
-    public async Task<dynamic> GetCyclistEarningsAsync(string cyclistId)
+    
+    [HttpGet("GetCyclistEarnings")]
+    public async Task<dynamic> GetCyclistEarningsAsync()
     {
+        string nameIdentifier = User.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
+
+        // Log extracted NameIdentifier for debugging
+        if (string.IsNullOrEmpty(nameIdentifier))
+        {
+            _logger.LogError("NameIdentifier is null or empty. Ensure the claim exists and is configured correctly.");
+            return null; // Or handle the error as appropriate
+        }
+
+        // Pass the NameIdentifier to the service method
+        var earnings = await CookService.GetCyclistEarningsAsync(nameIdentifier, _context);
         var timestamp = new DateTimeOffset(DateTime.UtcNow);
         var logInfo = new 
         { 
@@ -54,12 +66,24 @@ public class TripController : ControllerBase
         };
 
         _logger.LogInformation("Get called {@LogInfo} ", logInfo);
-        return await CookService.GetCyclistEarningsAsync(cyclistId, _context);
+        return earnings;
     }
     
-    [HttpGet("GetAverageRatingForCyclist/{cyclistId}")]
-    public async Task<dynamic> GetAverageRatingCyclist(string cyclistId)
+    [HttpGet("GetAverageRatingForCyclist")]
+    public async Task<dynamic> GetAverageRatingCyclist()
     {
+        string nameIdentifier = User.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
+        
+        // Log extracted NameIdentifier for debugging
+        if (string.IsNullOrEmpty(nameIdentifier))
+        {
+            _logger.LogError("NameIdentifier is null or empty. Ensure the claim exists and is configured correctly.");
+            return null; // Or handle the error as appropriate
+        }
+
+        // Pass the NameIdentifier to the service method
+        var rating = await CookService.GetAverageRatingForDriversAsync(nameIdentifier, _context);
+        Console.WriteLine(rating);
         var timestamp = new DateTimeOffset(DateTime.UtcNow);
         var logInfo = new 
         { 
@@ -69,6 +93,6 @@ public class TripController : ControllerBase
         };
 
         _logger.LogInformation("Get called {@LogInfo} ", logInfo);
-        return await CookService.GetAverageRatingForDriversAsync(cyclistId, _context);
+        return rating;
     }
 }

@@ -1,6 +1,7 @@
 using System.Globalization;
 using backendassign2.Entities;
 using System.Linq;
+using System.Net;
 using System.Runtime.Serialization;
 using backendassign2.DTOs;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -9,6 +10,8 @@ using Microsoft.VisualBasic;
 using MongoDB.Driver;
 using Serilog;
 using ServiceDto = backendassign2.DTOs.ServiceDto;
+using Microsoft.AspNetCore.Http;
+using KeyNotFoundException = System.Collections.Generic.KeyNotFoundException;
 
 namespace backendassign2.Services;
 
@@ -17,19 +20,26 @@ public static class CookService
     static CookService()
     {
     }
+    
+    public class HttpResponseException : Exception
+    {
+        public int StatusCode { get; set; }
+        public object Value { get; set; }
+    }
     public static async Task<List<ServiceDto.CookDto>> GetCooks(string name,dbcontext _context)
     {
         return await _context.ApiUsers
-            .Where(cook => cook.FullName.Equals(name))
-            .Select(cook => new ServiceDto.CookDto()
+            .Where(cook => cook.FullName.Contains(name))
+            .Join(_context.Cooks,
+                user => user.Id, 
+                cook => cook.CookId,
+                (user, cook) => new { user, cook })
+            .Select(result => new ServiceDto.CookDto()
             {
-                Address = cook.Address,
-                PhoneNo = cook.PhoneNo,
-                CookId = cook.Id
-            })
-            .Select(foodsafety => new ServiceDto.CookDto()
-            {
-                HasPassedFoodSafetyCourse = foodsafety.HasPassedFoodSafetyCourse
+                Address = result.user.Address,
+                PhoneNo = result.user.PhoneNo,
+                CookId = result.user.Id,
+                HasPassedFoodSafetyCourse = result.cook.HasPassedFoodSafetyCourse
             })
             .ToListAsync();
     }
@@ -157,15 +167,9 @@ public static class CookService
          "cookId": 1
        }
      */
-    public static async Task AddMealAsync(ServiceDto.AddMealDto AddmealDto, dbcontext _context)
+    public static async Task AddMealAsync(string cookId ,ServiceDto.AddMealDto AddmealDto, dbcontext _context)
     {
-        var cook = await _context.ApiUsers
-            .Where(cook => cook.Id == AddmealDto.CookId)
-            .FirstOrDefaultAsync();
-        if (cook == null)
-        {
-            throw new Exception("Cook not found");
-        }
+        
         var meal = new Meal()
         {
             Dish = AddmealDto.Dish,
@@ -173,34 +177,36 @@ public static class CookService
             Price = AddmealDto.Price,
             StartTime = AddmealDto.StartTime,
             EndTime = AddmealDto.EndTime,
-            Cook = cook
+            CookId = cookId
         };
         _context.Meals.Add(meal);
         await _context.SaveChangesAsync();
     }
     
-    public static async Task UpdateQuantityAsync(ServiceDto.UpdateQuantityDto updateQuantityDto, dbcontext _context)
+    public static async Task UpdateQuantityAsync(string cookId,ServiceDto.UpdateQuantityDto updateQuantityDto, dbcontext _context)
     {
         var meal = await _context.Meals
             .Where(meal => meal.mealId == updateQuantityDto.mealId)
+            .Where(meal => meal.Cook.Id == cookId)
             .FirstOrDefaultAsync();
         if (meal == null)
         {
-            throw new Exception("Meal not found");
+            throw new KeyNotFoundException("Meal not found or unauthorized access.");
         }
         
         meal.Quantity = updateQuantityDto.Quantity;
         await _context.SaveChangesAsync();
     }
     
-    public static async Task DeleteMealAsync(int mealId, dbcontext _context)
+    public static async Task DeleteMealAsync(string cookId,int mealId, dbcontext _context)
     {
         var meal = await _context.Meals
             .Where(meal => meal.mealId == mealId)
+            .Where(meal => meal.Cook.Id == cookId)
             .FirstOrDefaultAsync();
         if (meal == null)
         {
-            throw new Exception("Meal not found");
+            throw new KeyNotFoundException("Meal not found or unauthorized access.");
         }
         _context.Meals.Remove(meal);
         await _context.SaveChangesAsync();

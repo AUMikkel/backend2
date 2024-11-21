@@ -61,7 +61,7 @@ public class MenuController : ControllerBase
         return await CookService.GetDishesByCookAsync(cookId, _context);
     }
     [Authorize(Roles = "Cook")]
-    [HttpGet("GetAverageRatingForCookAsync/")]
+    [HttpGet("GetAverageRatingForCook")]
     public async Task<double?> GetAverageRatingForCookAsync()
     {
         // Extract NameIdentifier from claims
@@ -84,24 +84,12 @@ public class MenuController : ControllerBase
 
         return averageRating;
     }
-    
-    
-    [Authorize(Policy = "MatchFullNamePolicy")]
-    [HttpGet("testcookget/{fullName}")]
-    public async Task<string> testcookget(string fullName)
-    {
-        var timestamp = new DateTimeOffset(DateTime.UtcNow);
-        var logInfo = new 
-        { 
-            Operation = "Post", 
-            Timestamp = timestamp,
-            User = GetUserName() 
-        };
-        return "Hello " + fullName;
-    }
+    [Authorize(Roles = "Cook")] 
     [HttpPost("AddMeal")]
     public async Task<ActionResult<ServiceDto.AddMealDto>> AddMeal(ServiceDto.AddMealDto meal)
     {
+        string nameIdentifier = User.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
+        
         var timestamp = new DateTimeOffset(DateTime.UtcNow);
         var logInfo = new 
         { 
@@ -111,13 +99,15 @@ public class MenuController : ControllerBase
         };
 
         _logger.LogInformation("Post called {@LogInfo} ", logInfo);
-        await CookService.AddMealAsync(meal, _context);
+        await CookService.AddMealAsync(nameIdentifier,meal, _context);
         return Ok(meal);
     }
     
+    [Authorize(Roles = "Cook")]
     [HttpPut("UpdateQuantity")]
     public async Task<ActionResult<ServiceDto.AddMealDto>> UpdateQuantity(ServiceDto.UpdateQuantityDto meal)
     {
+        string nameIdentifier = User.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
         var timestamp = new DateTimeOffset(DateTime.UtcNow);
         var logInfo = new 
         { 
@@ -127,13 +117,29 @@ public class MenuController : ControllerBase
         };
 
         _logger.LogInformation("Put called {@LogInfo} ", logInfo);
-        await CookService.UpdateQuantityAsync(meal, _context);
-        return Ok(meal);
+
+        try
+        {
+            await CookService.UpdateQuantityAsync(nameIdentifier, meal, _context);
+            return Ok(meal);
+        }
+        catch (KeyNotFoundException ex) // Custom exception for "meal not found"
+        {
+            _logger.LogWarning(ex, "Meal not found or unauthorized access for Cook ID {CookId}", nameIdentifier);
+            return Forbid();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An unexpected error occurred during UpdateQuantity.");
+            return StatusCode(500, new { Message = "An unexpected error occurred." });
+        }
     }
     
+    [Authorize(Roles = "Cook")]
     [HttpDelete("DeleteMeal")]
     public async Task<ActionResult<ServiceDto.AddMealDto>> DeleteMeal(int mealId)
     {
+        string nameIdentifier = User.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
         var timestamp = new DateTimeOffset(DateTime.UtcNow);
         var logInfo = new 
         { 
@@ -141,10 +147,22 @@ public class MenuController : ControllerBase
             Timestamp = timestamp,
             User = GetUserName() 
         };
-
         _logger.LogInformation("Delete called {@LogInfo} ", logInfo);
-        await CookService.DeleteMealAsync(mealId, _context);
-        return Ok(mealId);
+        try
+        {
+            await CookService.DeleteMealAsync(nameIdentifier, mealId, _context);
+            return Ok(mealId);
+        }
+        catch (KeyNotFoundException ex) // Custom exception for "meal not found"
+        {
+            _logger.LogWarning(ex, "Meal not found or unauthorized access for Cook ID {CookId}", nameIdentifier);
+            return Forbid();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An unexpected error occurred during UpdateQuantity.");
+            return StatusCode(500, new { Message = "An unexpected error occurred." });
+        }
     }
     
     

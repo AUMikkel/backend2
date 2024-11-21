@@ -84,28 +84,22 @@ public class SeedController : ControllerBase
             EmailConfirmed = true
         };
         //ApiUsers.AddRange(customer1, customer2);
-        if (_userManager.FindByNameAsync(customeremail1).Result == null)
-        {
-            var cookUser = customer1;
+            var cust1 = customer1;
 
-            IdentityResult identityResult = _userManager.CreateAsync(cookUser, customerpass2).Result;
-            if (identityResult.Errors.Any())
+            IdentityResult identityResult5 = await _userManager.CreateAsync(cust1, customerpass1);
+            if (identityResult5.Errors.Any())
             {
-                var errors = string.Join(", ", identityResult.Errors.Select(e => e.Description));
+                var errors = string.Join(", ", identityResult5.Errors.Select(e => e.Description));
                 throw new Exception($"Error while creating user1 {customeremail1}: {errors}");
             }
-        }
-        if (_userManager.FindByNameAsync(customeremail2).Result == null)
-        {
-            var cookUser = customer2;
+            var cust2 = customer2;
 
-            IdentityResult identityResult = _userManager.CreateAsync(cookUser, customerpass2).Result;
-            if (identityResult.Errors.Any())
+            IdentityResult identityResult6 = await _userManager.CreateAsync(cust2, customerpass2);
+            if (identityResult6.Errors.Any())
             {
-                var errors = string.Join(", ", identityResult.Errors.Select(e => e.Description));
+                var errors = string.Join(", ", identityResult6.Errors.Select(e => e.Description));
                 throw new Exception($"Error while creating user2 {customeremail1}: {errors}");
             }
-        }
         
         
         Console.WriteLine("førcooks");
@@ -128,12 +122,10 @@ public class SeedController : ControllerBase
             Email = cookEmail2,
             EmailConfirmed = true
         };
-        if (_userManager.FindByNameAsync(cookEmail).Result == null)
-        {
-            var cookUser = cook1;
+            var cookUser1 = cook1;
 
-            IdentityResult identityResult = _userManager.CreateAsync(cookUser, cookPassword).Result;
-            if (identityResult.Succeeded)
+            IdentityResult identityResult1 = await _userManager.CreateAsync(cookUser1, cookPassword);
+            if (identityResult1.Succeeded)
             {
                 var newCookUser = _userManager.FindByNameAsync(cookEmail).Result;
                 var cookClaim = new Claim(ClaimTypes.Role, "Cook");
@@ -143,16 +135,13 @@ public class SeedController : ControllerBase
             }
             else
             {
-                var errors = string.Join(", ", identityResult.Errors.Select(e => e.Description));
+                var errors = string.Join(", ", identityResult1.Errors.Select(e => e.Description));
                 throw new Exception($"Error while creating cook1 {cookEmail}: {errors}");
             }
-        }
-        if (_userManager.FindByNameAsync(cookEmail2).Result == null)
-        {
-            var cookUser = cook2;
+            var cookUser2 = cook2;
 
-            IdentityResult identityResult = _userManager.CreateAsync(cookUser, cookPassword2).Result;
-            if (identityResult.Succeeded)
+            IdentityResult identityResult2 = await  _userManager.CreateAsync(cookUser2, cookPassword2);
+            if (identityResult2.Succeeded)
             {
                 var newCookUser = _userManager.FindByNameAsync(cookEmail2).Result;
                 var cookClaim = new Claim(ClaimTypes.Role, "Cook");
@@ -162,16 +151,30 @@ public class SeedController : ControllerBase
             }
             else
             {
-                var errors = string.Join(", ", identityResult.Errors.Select(e => e.Description));
-                throw new Exception($"Error while creating cook2 {cookEmail}: {errors}");
+                var errors = string.Join(", ", identityResult2.Errors.Select(e => e.Description));
+                throw new Exception($"Error while creating cook2 {cookEmail2}: {errors}");
             }
-        }
-        
+
+            Cook cook3 = new Cook()
+            {
+                CookId = cookUser1.Id,
+                ApiUser = cookUser1,
+                HasPassedFoodSafetyCourse = true
+            };
+            
+            Cook cook4 = new Cook()
+            {
+                CookId = cookUser2.Id,
+                ApiUser = cookUser2,
+                HasPassedFoodSafetyCourse = true
+            };
+            _context.Cooks.AddRange(cook3, cook4);
+        /*
         var existingCook1 = await _userManager.FindByNameAsync(cookEmail);
         if (existingCook1 == null)
         {
             throw new Exception($"Cook {cookEmail} not found. Ensure it was created successfully.");
-        }
+        }*/
         Meal meal1 = new Meal
         {
             Cook = cook1,
@@ -227,40 +230,38 @@ public class SeedController : ControllerBase
         };
         
         //ApiUsers.AddRange(driver1, driver2);
-        if (_userManager.FindByNameAsync(cyclistEmail).Result == null)
-        {
-            var cyclistUser = driver1;
+            var cyclistUser1 = driver1;
 
-            IdentityResult identityResult = _userManager.CreateAsync(cyclistUser, cyclistPassword).Result;
-            if (identityResult.Succeeded)
+            IdentityResult identityResult3 = await _userManager.CreateAsync(cyclistUser1, cyclistPassword);
+            if (identityResult3.Succeeded)
             {
                 var newCyclistUser = _userManager.FindByNameAsync(cyclistEmail).Result;
                 var cyclistClaim = new Claim(ClaimTypes.Role, "Cyclist");
+                var userclaim = new Claim(ClaimTypes.NameIdentifier, newCyclistUser.Id);
                 var claimAdded = _userManager.AddClaimAsync(newCyclistUser, cyclistClaim).Result;
+                await _userManager.AddClaimAsync(newCyclistUser, userclaim);
             }
             else
             {
                 throw new Exception($"Error while creating user {cyclistEmail}");
             }
-
-        }
-        if (_userManager.FindByNameAsync(cyclistEmail2).Result == null)
-        {
+            
             var cyclistUser = driver2;
 
-            IdentityResult identityResult = _userManager.CreateAsync(cyclistUser, cyclistPassword2).Result;
-            if (identityResult.Succeeded)
+            IdentityResult identityResult4 = await _userManager.CreateAsync(cyclistUser, cyclistPassword2);
+            if (identityResult4.Succeeded)
             {
                 var newCyclistUser = _userManager.FindByNameAsync(cyclistEmail2).Result;
                 var cyclistClaim = new Claim(ClaimTypes.Role, "Cyclist");
+                var userclaim = new Claim(ClaimTypes.NameIdentifier, newCyclistUser.Id);
                 var claimAdded = _userManager.AddClaimAsync(newCyclistUser, cyclistClaim).Result;
+                await _userManager.AddClaimAsync(newCyclistUser, userclaim);
             }
             else
             {
                 throw new Exception($"Error while creating user {cyclistEmail2}");
             }
-
-        }
+            
         
         CustomerOrder order1 = new CustomerOrder
         {
@@ -439,7 +440,7 @@ public class SeedController : ControllerBase
             adminUser.PhoneNo = "12345678";
             adminUser.EmailConfirmed = true;
 
-            IdentityResult identityResult = _userManager.CreateAsync(adminUser, adminPassword).Result;
+            IdentityResult identityResult = await _userManager.CreateAsync(adminUser, adminPassword);
             if (identityResult.Succeeded)
             {
                 var newAdminUser = _userManager.FindByNameAsync(adminEmail).Result;
@@ -471,7 +472,7 @@ public class SeedController : ControllerBase
             managerUser.PhoneNo = "87654321";
             managerUser.EmailConfirmed = true;
 
-            IdentityResult identityResult = _userManager.CreateAsync(managerUser, managerPassword).Result;
+            IdentityResult identityResult = await _userManager.CreateAsync(managerUser, managerPassword);
             if (identityResult.Succeeded)
             {
                 var newManagerUser = _userManager.FindByNameAsync(managerEmail).Result;

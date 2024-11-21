@@ -18,5 +18,7 @@ namespace backendassign2.Entities
 
         // Relationship with Meals
         public ICollection<Meal> Meals { get; set; } // Cooked meals
+        
+        
     }
 }

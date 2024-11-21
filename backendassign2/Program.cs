@@ -24,7 +24,13 @@ var databaseName = "Assignment2";
 conn = conn.Replace("{DatabaseName}", databaseName);
 builder.Services.Configure<MongoDBSettings>(builder.Configuration.GetSection("MongoDBSettings"));
 builder.Services.AddSingleton<MongoLogService>();
-
+builder.Services.AddDbContext<dbcontext>(options =>
+    options.UseSqlServer(conn, sqlServerOptions =>
+        sqlServerOptions.EnableRetryOnFailure(
+            maxRetryCount: 5, // Number of retry attempts
+            maxRetryDelay: TimeSpan.FromSeconds(30), // Max delay between retries
+            errorNumbersToAdd: null // Additional SQL error codes to consider transient
+        )));
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -66,8 +72,7 @@ builder.Host.UseSerilog((context, config) =>
 
 
 // Register DbContext
-builder.Services.AddDbContext<dbcontext>(options =>
-    options.UseSqlServer(conn));
+
 // Register Identity
 builder.Services.AddIdentity<ApiUser, IdentityRole>(option =>
     {

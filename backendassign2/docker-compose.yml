@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  # SQL Database service (SQL Server)
+  sql-db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sql-db
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=YourPassword123
+    ports:
+      - "1433:1433"  # Expose SQL server port
+    networks:
+      - backend-network
+    volumes:
+      - sql-data:/var/opt/mssql
+
+  # MongoDB service
+  mongo-db:
+    image: mongo:latest
+    container_name: mongo-db
+    ports:
+      - "27017:27017"  # Expose MongoDB port
+    networks:
+      - backend-network
+    volumes:
+      - mongo-data:/data/db
+
+  # .NET API service
+  dotnet-api:
+    build:
+      context: .  # Path to your project directory
+      dockerfile: Dockerfile  # Path to your Dockerfile
+    container_name: dotnet-api
+    ports:
+      - "5050:8080"  # Map port 5050 to 8080 inside the container
+    networks:
+      - backend-network
+    depends_on:
+      - sql-db  # Wait for SQL DB to be ready before starting
+      - mongo-db  # Wait for MongoDB to be ready before starting
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - DatabaseName=Assignment2
+      - DefaultConnection=Data Source=sqlserver;Initial Catalog={DatabaseName};User ID=sa;Password=sjjHHS239:_s23;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False;
+      - MongoDBSettings__ConnectionString=mongodb://mongodb:27017/assign3
+      - MongoDBSettings__DatabaseName=assign3
+
+networks:
+  backend-network:
+    driver: bridge
+
+volumes:
+  sql-data:
+  mongo-data:

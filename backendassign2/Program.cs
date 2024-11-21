@@ -18,12 +18,14 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddMvc();
 builder.Services.AddScoped<TokenService>();
-var conn = builder.Configuration.GetConnectionString("DefaultConnection");
-var databaseName = "Assignment2";
+var conn = builder.Configuration.GetConnectionString("DefaultConnection") ??
+           Environment.GetEnvironmentVariable("DefaultConnection"); // Check if environment variable is set
+var databaseName = Environment.GetEnvironmentVariable("DatabaseName") ?? "Assignment2"; // Default if not set
 // Replace placeholder with actual database name in connection string.
 conn = conn.Replace("{DatabaseName}", databaseName);
 builder.Services.Configure<MongoDBSettings>(builder.Configuration.GetSection("MongoDBSettings"));
 builder.Services.AddSingleton<MongoLogService>();
+
 builder.Services.AddDbContext<dbcontext>(options =>
     options.UseSqlServer(conn, sqlServerOptions =>
         sqlServerOptions.EnableRetryOnFailure(

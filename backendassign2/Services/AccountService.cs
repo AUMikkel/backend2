@@ -23,12 +23,14 @@ public static class AccountService
                 newUser.UserName = input.Email;
                 newUser.Email = input.Email;
                 newUser.FullName = input.FullName;
+                newUser.Address = input.Address;
+                newUser.PhoneNo = input.PhoneNo;
                 var result = await _userManager.CreateAsync(newUser, input.Password);
                 if (result.Succeeded)
                 {
                     _logger.LogInformation(
                     "User {userName} ({email}) has been created.",
-                    newUser.UserName, newUser.Email);
+                    newUser.UserName, newUser.Email, newUser.Address, newUser.PhoneNo);
                     return new ObjectResult($"User '{newUser.UserName}' has been created.") { StatusCode = 201 };
                 }
                 else

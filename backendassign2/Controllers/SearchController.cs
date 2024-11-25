@@ -23,14 +23,14 @@ public class SearchController : ControllerBase
     {
         return User?.Identity?.IsAuthenticated == true ? User.Identity.Name : "Anonymous";
     }
-    
+    [Authorize(Roles = "Admin")]
     [HttpGet("SearchLogs")]
     public async Task<IEnumerable<ServiceDto.LogDto>> SearchLogs(
-        DateTime startTime, 
-        DateTime endTime, 
+        DateTime? startTime = null, 
+        DateTime? endTime = null, 
         string? user = null, 
         string? operation = null)
-    {    
+    {
         var timestamp = new DateTimeOffset(DateTime.UtcNow);
         var logInfo = new 
         { 
@@ -38,10 +38,19 @@ public class SearchController : ControllerBase
             Timestamp = timestamp,
             User = GetUserName() 
         };
-    
-        // Ensure startTime and endTime are treated as UTC
-        var utcStartTime = DateTime.SpecifyKind(startTime, DateTimeKind.Utc);
-        var utcEndTime = DateTime.SpecifyKind(endTime, DateTimeKind.Utc);
+
+        // max and min if not specified and convert to UTC.
+        DateTime utcStartTime;
+        DateTime utcEndTime;
+        if (startTime.HasValue)
+            utcStartTime = DateTime.SpecifyKind(startTime.Value, DateTimeKind.Utc);
+        else
+            utcStartTime = DateTime.MinValue;
+        
+        if (endTime.HasValue)
+            utcEndTime = DateTime.SpecifyKind(endTime.Value, DateTimeKind.Utc);
+        else
+            utcEndTime = DateTime.MaxValue;
 
         _logger.LogInformation("Get called {@LogInfo} ", logInfo);
 

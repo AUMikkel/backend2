@@ -34,7 +34,7 @@ services:
       dockerfile: Dockerfile  # Path to your Dockerfile
     container_name: dotnet-api
     ports:
-      - "5132:5132"  # Align with applicationUrl in launchsettings
+      - "8080:8080"  # Align with applicationUrl in launchsettings
     networks:
       - backend-network
     depends_on:

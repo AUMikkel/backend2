@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using System.Security.Claims;
+using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,11 +26,8 @@ var conn = builder.Configuration.GetConnectionString("DefaultConnection") ??
 var databaseName = Environment.GetEnvironmentVariable("DatabaseName") ?? "Assignment3"; // Default if not set
 // Replace placeholder with actual database name in connection string.
 conn = conn.Replace("{DatabaseName}", databaseName);
-//get mongodbsettings from environment
-builder.Services.Configure<MongoDBSettings>(options =>
-{
-    options.ConnectionString = Environment.GetEnvironmentVariable("MongoDBSettings__ConnectionString");
-});
+
+builder.Services.Configure<MongoDBSettings>(builder.Configuration.GetSection("MongoDBSettings"));
 builder.Services.AddSingleton<MongoLogService>();
 
 builder.Services.AddDbContext<dbcontext>(options =>
@@ -116,6 +114,8 @@ builder.Services.AddAuthentication(options =>
 
 
 var app = builder.Build();
+
+/*
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -129,15 +129,15 @@ using (var scope = app.Services.CreateScope())
     {
         Console.WriteLine($"Error applying migrations: {ex.Message}");
     }
-}
+}*/
+
 try
 {
-    var mongoConnectionString = Environment.GetEnvironmentVariable("MongoDBSettings__ConnectionString");
-    Console.WriteLine($"MongoDB Connection String: {mongoConnectionString}");
-    // Test connection
-    var client = new MongoClient(mongoConnectionString);
-    var database = client.GetDatabase("assign3");
-    Console.WriteLine("MongoDB connection successful!");
+    var mongoSettings = app.Services.GetRequiredService<IOptions<MongoDBSettings>>().Value;
+   
+    var client = new MongoClient(mongoSettings.ConnectionString);
+    var database = client.GetDatabase(mongoSettings.DatabaseName);
+    Console.WriteLine("Successfully connected to MongoDB and accessed database: " + mongoSettings.DatabaseName);
 }
 catch (Exception ex)
 {

@@ -103,7 +103,7 @@ public class MenuController : ControllerBase
 
         _logger.LogInformation("Post called {@LogInfo} ", logInfo);
         await CookService.AddMealAsync(nameIdentifier,meal, _context);
-        return Ok(meal);
+        return Created("Add meal",meal);
     }
     
     [Authorize(Roles = "Cook")]

@@ -20,7 +20,8 @@ builder.Services.AddMvc();
 builder.Services.AddScoped<TokenService>();
 var conn = builder.Configuration.GetConnectionString("DefaultConnection") ??
            Environment.GetEnvironmentVariable("DefaultConnection"); // Check if environment variable is set
-var databaseName = Environment.GetEnvironmentVariable("DatabaseName") ?? "Assignment2"; // Default if not set
+Console.WriteLine("Connection string: " + conn);
+var databaseName = Environment.GetEnvironmentVariable("DatabaseName") ?? "Assignment3"; // Default if not set
 // Replace placeholder with actual database name in connection string.
 conn = conn.Replace("{DatabaseName}", databaseName);
 builder.Services.Configure<MongoDBSettings>(builder.Configuration.GetSection("MongoDBSettings"));

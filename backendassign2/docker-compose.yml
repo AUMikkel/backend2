@@ -2,12 +2,18 @@ version: '3.8'
 
 services:
   # SQL Database service (SQL Server)
-  sql-db:
+  sqldb:
     image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: sql-db
+    container_name: sqldb
+    healthcheck:
+      test: ["/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "sjjHHS239:_s23", "-Q", "SELECT 1", "-b", "-o", "/dev/null"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
     environment:
       - ACCEPT_EULA=Y
-      - SA_PASSWORD=YourPassword123
+      - SA_PASSWORD=sjjHHS239:_s23
     ports:
       - "1433:1433"  # Expose SQL server port
     networks:
@@ -16,9 +22,9 @@ services:
       - sql-data:/var/opt/mssql
 
   # MongoDB service
-  mongo-db:
+  mongodb:
     image: mongo:latest
-    container_name: mongo-db
+    container_name: mongodb
     ports:
       - "27017:27017"  # Expose MongoDB port
     networks:
@@ -37,12 +43,14 @@ services:
     networks:
       - backend-network
     depends_on:
-      - sql-db  # Wait for SQL DB to be ready before starting
-      - mongo-db  # Wait for MongoDB to be ready before starting
+      sqldb:
+        condition: service_healthy
+      mongodb:
+       condition: service_started
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      - DatabaseName=Assignment2
-      - DefaultConnection=Data Source=sqlserver;Initial Catalog={DatabaseName};User ID=sa;Password=sjjHHS239:_s23;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False;
+      - DatabaseName=Assignment3
+      - DefaultConnection=Data Source=sqldb;Initial Catalog={DatabaseName};User ID=sa;Password=sjjHHS239:_s23;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False;
       - MongoDBSettings__ConnectionString=mongodb://mongodb:27017/assign3
       - MongoDBSettings__DatabaseName=assign3
 

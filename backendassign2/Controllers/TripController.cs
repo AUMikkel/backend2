@@ -83,7 +83,7 @@ public class TripController : ControllerBase
 
         // Pass the NameIdentifier to the service method
         var rating = await CookService.GetAverageRatingForDriversAsync(nameIdentifier, _context);
-        Console.WriteLine(rating);
+        
         var timestamp = new DateTimeOffset(DateTime.UtcNow);
         var logInfo = new 
         { 

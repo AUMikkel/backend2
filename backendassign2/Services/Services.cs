@@ -54,7 +54,8 @@ public static class CookService
                 Quantity = meal.Quantity,
                 Price = meal.Price,
                 StartTime = meal.StartTime.ToString("dd-MM-yyyy HH:mm"),
-                EndTime = meal.EndTime.ToString("dd-MM-yyyy HH:mm")
+                EndTime = meal.EndTime.ToString("dd-MM-yyyy HH:mm"),
+                mealId = meal.mealId
             })
             .ToListAsync();
     }

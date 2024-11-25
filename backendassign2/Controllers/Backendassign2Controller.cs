@@ -29,8 +29,8 @@ public class MenuController : ControllerBase
         return User?.Identity?.IsAuthenticated == true ? User.Identity.Name : "Anonymous";
     }
    
-    [Authorize("ManagerAccess")]
-    [HttpGet("GetCooks")]
+    [Authorize(Roles = "Manager")]
+    [HttpGet("GetCook")]
     public async Task<IEnumerable<ServiceDto.CookDto>> Get(string name)
     {
         var timestamp = new DateTimeOffset(DateTime.UtcNow);
@@ -74,13 +74,16 @@ public class MenuController : ControllerBase
             return null; // Or handle the error as appropriate
         }
 
-        Console.WriteLine($"Extracted NameIdentifier: {nameIdentifier}");
-
+        var timestamp = new DateTimeOffset(DateTime.UtcNow);
+        var logInfo = new 
+        { 
+            Operation = "Get", 
+            Timestamp = timestamp,
+            User = GetUserName() 
+        };
+        _logger.LogInformation("Post called {@LogInfo} ", logInfo);
         // Pass the NameIdentifier to the service method
         var averageRating = await CookService.GetAverageRatingForCookAsync(nameIdentifier, _context);
-
-        // Log the result
-        Console.WriteLine($"Average Rating for Cook {nameIdentifier}: {averageRating}");
 
         return averageRating;
     }

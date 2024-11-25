@@ -32,10 +32,23 @@ public class AccountController : ControllerBase
         _signInManager = signInManager;
         _tokenService = tokenService;
     }
+    
+    private string GetUserName()
+    {
+        return User?.Identity?.IsAuthenticated == true ? User.Identity.Name : "Anonymous";
+    }
 
     [HttpPost("Register")]
     public async Task<ActionResult<RegisterDTO>> Register(RegisterDTO user)
     {
+        var timestamp = new DateTimeOffset(DateTime.UtcNow);
+        var logInfo = new 
+        { 
+            Operation = "Get", 
+            Timestamp = timestamp,
+            User = GetUserName() 
+        };
+        _logger.LogInformation("Post called {@LogInfo} ", logInfo);
         return await AccountService.Register(user, _context, _userManager, _logger, ModelState);
     }
 
@@ -47,6 +60,14 @@ public class AccountController : ControllerBase
         {
             return Unauthorized("Invalid username or password.");
         }
+        var timestamp = new DateTimeOffset(DateTime.UtcNow);
+        var logInfo = new 
+        { 
+            Operation = "Get", 
+            Timestamp = timestamp,
+            User = GetUserName() 
+        };
+        _logger.LogInformation("Post called {@LogInfo} ", logInfo);
 
         var userClaims = await _userManager.GetClaimsAsync(user);
 

@@ -39,8 +39,6 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
     c.SchemaFilter<PriceValidationSchemaFilter>();
-    //c.ParameterFilter<SortColumnFilter>();
-    //c.ParameterFilter<SortOrderFilter>();
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         In = ParameterLocation.Header,
@@ -73,8 +71,6 @@ builder.Host.UseSerilog((context, config) =>
 });
 
 
-
-// Register DbContext
 
 // Register Identity
 builder.Services.AddIdentity<ApiUser, IdentityRole>(option =>
@@ -115,7 +111,20 @@ builder.Services.AddAuthentication(options =>
 
 
 var app = builder.Build();
-
+/*using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<dbcontext>();
+        context.Database.Migrate(); // Automatically applies pending migrations
+        Console.WriteLine("Migrations applied successfully.");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error applying migrations: {ex.Message}");
+    }
+}*/
 //Seed the database
 using (var scope = app.Services.CreateScope())
 {
@@ -125,11 +134,8 @@ using (var scope = app.Services.CreateScope())
     //context.Seed();
 }
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 
 app.UseHttpsRedirection();

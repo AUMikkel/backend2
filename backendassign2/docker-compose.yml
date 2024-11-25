@@ -2,29 +2,23 @@ version: '3.8'
 
 services:
   # SQL Database service (SQL Server)
-  sqldb:
+  sql3:
     image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: sqldb
-    healthcheck:
-      test: ["/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "sjjHHS239:_s23", "-Q", "SELECT 1", "-b", "-o", "/dev/null"]
-      interval: 10s
-      timeout: 3s
-      retries: 10
-      start_period: 10s
+    container_name: sql3
     environment:
       - ACCEPT_EULA=Y
-      - SA_PASSWORD=sjjHHS239:_s23
+      - SA_PASSWORD=AU650889?
     ports:
       - "1433:1433"  # Expose SQL server port
     networks:
       - backend-network
     volumes:
-      - sql-data:/var/opt/mssql
+      - sql-data5:/var/opt/mssql
 
   # MongoDB service
-  mongodb:
+  mongoex3:
     image: mongo:latest
-    container_name: mongodb
+    container_name: mongoex3
     ports:
       - "27017:27017"  # Expose MongoDB port
     networks:
@@ -39,19 +33,17 @@ services:
       dockerfile: Dockerfile  # Path to your Dockerfile
     container_name: dotnet-api
     ports:
-      - "5050:8080"  # Map port 5050 to 8080 inside the container
+      - "5050:5132"  # Map port 5050 to 5132 inside the container
     networks:
       - backend-network
     depends_on:
-      sqldb:
-        condition: service_healthy
-      mongodb:
-       condition: service_started
+      - sql3
+      - mongoex3
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - DatabaseName=Assignment3
-      - DefaultConnection=Data Source=sqldb;Initial Catalog={DatabaseName};User ID=sa;Password=sjjHHS239:_s23;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False;
-      - MongoDBSettings__ConnectionString=mongodb://mongodb:27017/assign3
+      - DefaultConnection=Data Source=sql3;Initial Catalog={DatabaseName};User ID=sa;Password=AU650889?;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False;
+      - MongoDBSettings__ConnectionString=mongodb://mongoex3:27017/assign3
       - MongoDBSettings__DatabaseName=assign3
 
 networks:
@@ -59,5 +51,5 @@ networks:
     driver: bridge
 
 volumes:
-  sql-data:
+  sql-data5:
   mongo-data:

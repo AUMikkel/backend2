@@ -16,7 +16,7 @@ namespace backendassign2.Controllers;
 [Route("api/")]
 public class SeedController : ControllerBase
 {
-    private readonly ILogger<AccountController> _logger;
+    private readonly ILogger<SeedController> _logger;
     private readonly UserManager<ApiUser> _userManager;
     private readonly dbcontext _context;
     public DbSet<CustomerOrder> CustomerOrders { get; set; }
@@ -27,7 +27,7 @@ public class SeedController : ControllerBase
     public DbSet<Trip> Trip { get; set; }
     public DbSet<ApiUser> ApiUsers { get; set; }
     public SeedController(dbcontext context,
-                            ILogger<AccountController> logger,
+                            ILogger<SeedController> logger,
                             UserManager<ApiUser> userManager)
     {
         _logger = logger;
@@ -36,7 +36,6 @@ public class SeedController : ControllerBase
     }
 
     [HttpPut("Seed")]
-    
     public async Task<ActionResult> Seed()
     {
         Console.WriteLine("Seeding data");

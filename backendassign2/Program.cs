@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using System.Security.Claims;
+using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,7 +25,11 @@ var conn = builder.Configuration.GetConnectionString("DefaultConnection") ??
 var databaseName = Environment.GetEnvironmentVariable("DatabaseName") ?? "Assignment3"; // Default if not set
 // Replace placeholder with actual database name in connection string.
 conn = conn.Replace("{DatabaseName}", databaseName);
-builder.Services.Configure<MongoDBSettings>(builder.Configuration.GetSection("MongoDBSettings"));
+//get mongodbsettings from environment
+builder.Services.Configure<MongoDBSettings>(options =>
+{
+    options.ConnectionString = Environment.GetEnvironmentVariable("MongoDBSettings__ConnectionString");
+});
 builder.Services.AddSingleton<MongoLogService>();
 
 builder.Services.AddDbContext<dbcontext>(options =>
@@ -111,7 +116,7 @@ builder.Services.AddAuthentication(options =>
 
 
 var app = builder.Build();
-/*using (var scope = app.Services.CreateScope())
+using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     try
@@ -124,13 +129,27 @@ var app = builder.Build();
     {
         Console.WriteLine($"Error applying migrations: {ex.Message}");
     }
-}*/
+}
+try
+{
+    var mongoConnectionString = Environment.GetEnvironmentVariable("MongoDBSettings__ConnectionString");
+    Console.WriteLine($"MongoDB Connection String: {mongoConnectionString}");
+    // Test connection
+    var client = new MongoClient(mongoConnectionString);
+    var database = client.GetDatabase("assign3");
+    Console.WriteLine("MongoDB connection successful!");
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Error connecting to MongoDB: {ex.Message}");
+}
 //Seed the database
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     var context = services.GetRequiredService<dbcontext>();
     context.Database.EnsureCreated();
+    Console.WriteLine("Database created successfully.");
     //context.Seed();
 }
 // Configure the HTTP request pipeline.

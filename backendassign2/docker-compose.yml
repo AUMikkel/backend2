@@ -13,7 +13,7 @@ services:
     networks:
       - backend-network
     volumes:
-      - sql-data5:/var/opt/mssql
+      - sql-data6:/var/opt/mssql
 
   # MongoDB service
   mongoex3:
@@ -25,6 +25,7 @@ services:
       - backend-network
     volumes:
       - mongo-data:/data/db
+      - ./mongo-init-scripts:/docker-entrypoint-initdb.d
 
   # .NET API service
   dotnet-api:
@@ -33,16 +34,16 @@ services:
       dockerfile: Dockerfile  # Path to your Dockerfile
     container_name: dotnet-api
     ports:
-      - "5050:5132"  # Map port 5050 to 5132 inside the container
+      - "5132:5132"  # Align with applicationUrl in launchsettings
     networks:
       - backend-network
     depends_on:
       - sql3
       - mongoex3
     environment:
-      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_ENVIRONMENT=Release
       - DatabaseName=Assignment3
-      - DefaultConnection=Data Source=sql3;Initial Catalog={DatabaseName};User ID=sa;Password=AU650889?;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False;
+      - DefaultConnection=Server=sql3;Initial Catalog={DatabaseName};User ID=sa;Password=AU650889?;TrustServerCertificate=True
       - MongoDBSettings__ConnectionString=mongodb://mongoex3:27017/assign3
       - MongoDBSettings__DatabaseName=assign3
 
@@ -51,5 +52,5 @@ networks:
     driver: bridge
 
 volumes:
-  sql-data5:
+  sql-data6:
   mongo-data:

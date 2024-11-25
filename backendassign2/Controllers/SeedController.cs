@@ -102,7 +102,6 @@ public class SeedController : ControllerBase
             }
         
         
-        Console.WriteLine("førcooks");
         ApiUser cook1 = new ApiUser()
         {
             FullName = "Jane Cook",
@@ -208,7 +207,6 @@ public class SeedController : ControllerBase
             EndTime = new DateTime(2024,08,12, 18,0,0)
         };
         
-        Console.WriteLine("eftermeals");
         
         ApiUser driver1 = new ApiUser()
         {
@@ -403,11 +401,8 @@ public class SeedController : ControllerBase
             Type = "Delivery",
             Trip = trip3
         };
-        Console.WriteLine("eftertripdetails");
         _context.Meals.AddRange(meal1, meal2, meal3);
-        Console.WriteLine("eftermeals2");
         _context.CustomerOrders.AddRange(order1, order2, order3, order4, order5);
-        Console.WriteLine("efterorders");
         _context.OrderMeals.AddRange(orderMeal1, orderMeal2, orderMeal3, orderMeal4, orderMeal5);
         _context.Trip.AddRange(trip1,trip2,trip3);
         order1.Trip = trip1;
@@ -417,7 +412,7 @@ public class SeedController : ControllerBase
         order5.Trip = trip3;
         
         _context.TripDetails.AddRange(tripdetails1, tripdetails2, tripdetails3, tripdetails4, tripdetails5, tripdetails6);
-        Console.WriteLine("eftertrip");
+       
         
         _context.SaveChanges();
     

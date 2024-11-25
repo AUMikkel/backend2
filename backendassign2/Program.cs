@@ -32,7 +32,7 @@ builder.Services.AddDbContext<dbcontext>(options =>
         sqlServerOptions.EnableRetryOnFailure(
             maxRetryCount: 5, // Number of retry attempts
             maxRetryDelay: TimeSpan.FromSeconds(30), // Max delay between retries
-            errorNumbersToAdd: null // Additional SQL error codes to consider transient
+            errorNumbersToAdd: null
         )));
 
 builder.Services.AddSwaggerGen(c =>
@@ -111,12 +111,7 @@ builder.Services.AddAuthentication(options =>
     });
 
 // Add the authorization service
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("ManagerAccess", policy =>
-                    policy.RequireClaim(ClaimTypes.Role, "Manager"));
 
-});
 
 
 var app = builder.Build();

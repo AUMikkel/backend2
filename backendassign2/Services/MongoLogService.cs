@@ -43,7 +43,6 @@ namespace backendassign2.Services
             {
                 filter &= builder.Eq(log => log.Properties.LogInfo.Operation, operation);
             }
-            Console.WriteLine("her");
             return await _logsCollection.Find(filter).ToListAsync();
         }
     }

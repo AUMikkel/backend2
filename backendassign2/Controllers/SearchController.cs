@@ -51,11 +51,12 @@ public class SearchController : ControllerBase
             utcEndTime = DateTime.SpecifyKind(endTime.Value, DateTimeKind.Utc);
         else
             utcEndTime = DateTime.MaxValue;
-
+        Console.WriteLine("Before LogInformation");
         _logger.LogInformation("Get called {@LogInfo} ", logInfo);
-
+        Console.WriteLine("After LogInformation");
         // Fetch logs with the specified criteria
         var logs = await _mongoLogService.GetLogsAsync(utcStartTime, utcEndTime, user, operation);
+        Console.WriteLine("Logs fetched");
         return logs;
     }
 }

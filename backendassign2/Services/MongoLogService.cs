@@ -19,7 +19,7 @@ namespace backendassign2.Services
 
         public MongoLogService(IOptions<MongoDBSettings> mongoSettings)
         {
-            var mongoClient = new MongoClient();
+            var mongoClient = new MongoClient(mongoSettings.Value.ConnectionString);
             var database = mongoClient.GetDatabase(mongoSettings.Value.DatabaseName);
             _logsCollection = database.GetCollection<ServiceDto.LogDto>(mongoSettings.Value.CollectionName);
         }
@@ -43,8 +43,7 @@ namespace backendassign2.Services
             {
                 filter &= builder.Eq(log => log.Properties.LogInfo.Operation, operation);
             }
-
-            
+            Console.WriteLine("her");
             return await _logsCollection.Find(filter).ToListAsync();
         }
     }

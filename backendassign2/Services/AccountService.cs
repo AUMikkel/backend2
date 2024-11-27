@@ -25,6 +25,12 @@ public static class AccountService
                 newUser.FullName = input.FullName;
                 newUser.Address = input.Address;
                 newUser.PhoneNo = input.PhoneNo;
+                // Check if the mail exists
+                var existingUser = await _userManager.FindByEmailAsync(input.Email);
+                if (existingUser != null)
+                {
+                    return new ObjectResult("Email already in use") { StatusCode = 400 };
+                }
                 var result = await _userManager.CreateAsync(newUser, input.Password);
                 if (result.Succeeded)
                 {

@@ -1,19 +1,39 @@
-version: '3.8'
-
 services:
   # SQL Database service (SQL Server)
   sql3:
-    image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: sql3
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    user: root
     environment:
-      - ACCEPT_EULA=Y
-      - SA_PASSWORD=AU650889?
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: AU650889?
     ports:
       - "1433:1433"  # Expose SQL server port
+    healthcheck:
+
+      test:
+
+        [
+
+          "CMD-SHELL",
+
+          "/opt/mssql-tools18/bin/sqlcmd -U sa -P AU650889? -C -Q 'SELECT 1'  -b -o /dev/null"
+
+        ]
+
+      interval: 60s
+
+      timeout: 30s
+
+      retries: 5
+
+      start_period: 300s
+
+      start_interval: 10s
     networks:
       - backend-network
     volumes:
-      - sql-data6:/var/opt/mssql
+      - sql-data6:/var/opt/mssql/data
 
   # MongoDB service
   mongoex3:
@@ -38,8 +58,10 @@ services:
     networks:
       - backend-network
     depends_on:
-      - sql3
-      - mongoex3
+      sql3:
+        condition: service_healthy  # Wait for SQL Server to start
+      mongoex3:
+        condition: service_started  # Wait for MongoDB to start
     environment:
       - ASPNETCORE_ENVIRONMENT=Release
       - DatabaseName=Assignment3
@@ -53,4 +75,5 @@ networks:
 
 volumes:
   sql-data6:
+    name: sqlvolume6
   mongo-data:

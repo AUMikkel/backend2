@@ -26,7 +26,7 @@ namespace backendassign2.Services
 
         public async Task<List<ServiceDto.LogDto>> GetLogsAsync(DateTime startTime, DateTime endTime, string? user = null, string? operation = null)
         {
-            
+            Console.WriteLine("Inside GetLogsAsync");
             var builder = Builders<ServiceDto.LogDto>.Filter;
             // Base filter for the date range
             var filter = builder.Gte(log => log.Timestamp, startTime) &
@@ -44,7 +44,7 @@ namespace backendassign2.Services
                 filter &= builder.Eq(log => log.Properties.LogInfo.Operation, operation);
             }
 
-            
+            Console.WriteLine("Before Find");
             return await _logsCollection.Find(filter).ToListAsync();
         }
     }
